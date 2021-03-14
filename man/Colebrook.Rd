@@ -13,11 +13,11 @@ Colebrook(roughness, D, Re, tol = 1e-08, itMax = 10, warn = TRUE)
 
 \item{Re}{Reynold number}
 
-\item{tol}{Tolerance (acceptable error in convergence)}
+\item{tol}{Tolerance in Newton-Raphson method (optional)}
 
-\item{itMax}{Maximum number of iteration}
+\item{itMax}{Maximum number of iteration  (optional)}
 
-\item{warn}{show warnings when Re <= 4000}
+\item{warn}{show warnings when Re <= 4000  (optional)}
 }
 \value{
 Darcy friction factor

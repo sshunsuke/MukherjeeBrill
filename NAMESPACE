@@ -2,7 +2,6 @@
 
 export(Blasius)
 export(Colebrook)
-export(a)
 export(dPdL_MB)
 export(dlns_MB)
 export(exec_glfMB)

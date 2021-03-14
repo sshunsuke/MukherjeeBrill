@@ -4,17 +4,8 @@
 \alias{dlns_MB}
 \title{Calculate dimensionless numbers}
 \usage{
-dlns_MB(
-  vsG,
-  vsL,
-  D,
-  densityG,
-  densityL,
-  viscosityG,
-  viscosityL,
-  surfaceTension,
-  angle
-)
+dlns_MB(vsG, vsL, D, densityG, densityL,
+        viscosityG, viscosityL, surfaceTension, angle)
 }
 \arguments{
 \item{vsG}{Superficial velocity of gas}

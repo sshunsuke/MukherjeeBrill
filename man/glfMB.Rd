@@ -3,7 +3,14 @@
 \docType{package}
 \name{glfMB}
 \alias{glfMB}
-\title{glfMB}
+\title{glfMB - Gas-Liquid Flow model of Mukherjee and Brill}
 \description{
-aaa
+A package for calculation of gas-liquid two-phase flow in a circular pipe
+with the model of Mukherjee and Brill (1985), which predicts flow regime, liquid holdup, and pressure drop.
+}
+\references{
+\itemize{
+\item Mukherjee, H., and J. P. Brill. 1985. Pressure Drop Correlations for Inclined Two-Phase Flow. Journal of Energy Resources Technology, Transactions of the ASME 107 (4)
+\item Mukherjee, Hemanta, and James P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
+}
 }

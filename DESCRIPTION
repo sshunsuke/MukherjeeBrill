@@ -1,7 +1,7 @@
 Package: glfMB
 Type: Package
 Title: Mukherjee & Brill model for gas-liquid two-phase flow in a circular pipe
-Version: 0.1.0
+Version: 0.1.1
 Author: Shunsuke
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: More about what it does (maybe more than one line)
@@ -14,3 +14,4 @@ Depends:
     R (>= 2.10)
 Imports:
     stats
+

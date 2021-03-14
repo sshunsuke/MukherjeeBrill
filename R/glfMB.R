@@ -1,13 +1,22 @@
-#' glfMB
+#' glfMB - Gas-Liquid Flow model of Mukherjee and Brill
 #'
-#' aaa
+#' A package for calculation of gas-liquid two-phase flow in a circular pipe
+#' with the model of Mukherjee and Brill (1985), which predicts flow regime, liquid holdup, and pressure drop.
+#'
+#' @references
+#' * Mukherjee, H., and J. P. Brill. 1985. Pressure Drop Correlations for Inclined Two-Phase Flow. Journal of Energy Resources Technology, Transactions of the ASME 107 (4)
+#' * Mukherjee, Hemanta, and James P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
 #'
 #' @name glfMB
 #' @docType package
 #' @import stats
+#' @md
 NULL
 
-
+# Note:
+# The numbers in comments, such as "(4.130)", indicate the equation numbers in Brill and Mukherjee ().
+#
+#
 
 
 
@@ -27,7 +36,11 @@ g <- 9.8    # Gravitational acceleration (m/s2)
 
 #' Execute Mukherjee & Brill model
 #'
-#' Calculate flow regime, holdup, and pressure drop (dPdL).
+#' Calculate flow regime, holdup, and pressure drop with the model of Mukherjee and Brill (1985).
+#'
+#' @usage exec_glfMB(vsG, vsL, D, densityG, densityL,
+#'            viscosityG, viscosityL, surfaceTension,
+#'            angle, pressure, roughness)
 #'
 #' @param vsG Superficial velocity of gas - m/s
 #' @param vsL Superficial velocity of liquid - m/s
@@ -42,9 +55,10 @@ g <- 9.8    # Gravitational acceleration (m/s2)
 #' @param roughness Pipe roughness
 #'
 #' @return Data frame including following data:
-#' * `fr`: Flow regime
+#' * `fr`: Flow regime (1: Stratified, 2: Annular, 3: Slug, and 4: Bubbly)
 #' * `hl`: Holdup
 #' * `dPdL`: Pressure drop per unit length - Pa/m
+#'
 #' * `NLv`: Liquid velocity number
 #' * `NGv`: Gas velocity number
 #' * `Nd`: Pipe diameter number
@@ -54,14 +68,25 @@ g <- 9.8    # Gravitational acceleration (m/s2)
 #' * `NLvBS_up`: Bubble/Slug transition (Upflow)
 #' * `NLvST`: Stratified (Downflow)
 #'
+#' @references
+#' * Mukherjee, H., and J. P. Brill. 1985. Pressure Drop Correlations for Inclined Two-Phase Flow. Journal of Energy Resources Technology, Transactions of the ASME 107 (4)
+#' * Mukherjee, Hemanta, and James P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
 #'
 #' @examples
 #' \dontrun{
 #'   exec_glfMB(1.18, 1.21, 0.152, 94.2, 762.6, 1.6e-05, 0.00097, 0.00841, 1.5708)
 #' }
+#'
+#' @note You can execute the calculation step by step without this function if want. Below is an example.
+#' ```
+#'   dlns <- dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
+#'   fr   <- flow_regime_MB(dlns)
+#'   hl <- holdup_MB(dlns, fr)
+#'   dPdL <- dPdL_MB(dlns, fr, hl, pressure)
+#' ```
+#'
 #' @export
 #' @md
-
 exec_glfMB <- function(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle, pressure, roughness) {
   dlns <- dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
   fr   <- flow_regime_MB(dlns)
@@ -104,9 +129,9 @@ Blasius <- function(Re) {
 #' @param roughness Pipe roughness
 #' @param D Pipe diameter
 #' @param Re Reynold number
-#' @param tol Tolerance (acceptable error in convergence)
-#' @param itMax Maximum number of iteration
-#' @param warn show warnings when Re <= 4000
+#' @param tol Tolerance in Newton-Raphson method (optional)
+#' @param itMax Maximum number of iteration  (optional)
+#' @param warn show warnings when Re <= 4000  (optional)
 #'
 #' @return Darcy friction factor
 #' @export
@@ -157,8 +182,7 @@ testdata <- 1:10
 
 
 
-#' aa
-#' @export
+# aa
 a <- function() {cat(g); rad2deg(10)}
 
 
@@ -191,6 +215,9 @@ a <- function() {cat(g); rad2deg(10)}
 #' @param angle Pipe angle in radian (0 is horizontal flow)
 #'
 #' @return Data frame of dimensionless numbers (`NLv`, `NGv`, `Nd`, `NL`, `NGvSM`, `NLvBS`, `NGvBS_up`, and `NLvST`) and input values
+#'
+#' @usage dlns_MB(vsG, vsL, D, densityG, densityL,
+#'         viscosityG, viscosityL, surfaceTension, angle)
 #'
 #' @examples
 #' \dontrun{
@@ -416,7 +443,7 @@ dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosityL
 
     # delta: angle related to liquid level (shown in Fig 4.20)
     fun <- function(delta) { 1/(2*pi) * (delta - sin(delta)) - HL }  # (4.147)
-    f <- uniroot(fun, c(0,2*pi))
+    f <- stats::uniroot(fun, c(0,2*pi))
     delta <- f$root
 
     # Flow area of each phase

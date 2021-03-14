@@ -4,19 +4,9 @@
 \alias{exec_glfMB}
 \title{Execute Mukherjee & Brill model}
 \usage{
-exec_glfMB(
-  vsG,
-  vsL,
-  D,
-  densityG,
-  densityL,
-  viscosityG,
-  viscosityL,
-  surfaceTension,
-  angle,
-  pressure,
-  roughness
-)
+exec_glfMB(vsG, vsL, D, densityG, densityL,
+           viscosityG, viscosityL, surfaceTension,
+           angle, pressure, roughness)
 }
 \arguments{
 \item{vsG}{Superficial velocity of gas - m/s}
@@ -44,7 +34,7 @@ exec_glfMB(
 \value{
 Data frame including following data:
 \itemize{
-\item \code{fr}: Flow regime
+\item \code{fr}: Flow regime (1: Stratified, 2: Annular, 3: Slug, and 4: Bubbly)
 \item \code{hl}: Holdup
 \item \code{dPdL}: Pressure drop per unit length - Pa/m
 \item \code{NLv}: Liquid velocity number
@@ -58,10 +48,24 @@ Data frame including following data:
 }
 }
 \description{
-Calculate flow regime, holdup, and pressure drop (dPdL).
+Calculate flow regime, holdup, and pressure drop with the model of Mukherjee and Brill (1985).
+}
+\note{
+You can execute the calculation step by step without this function if want. Below is an example.\preformatted{  dlns <- dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
+  fr   <- flow_regime_MB(dlns)
+  hl <- holdup_MB(dlns, fr)
+  dPdL <- dPdL_MB(dlns, fr, hl, pressure)
+}
 }
 \examples{
 \dontrun{
   exec_glfMB(1.18, 1.21, 0.152, 94.2, 762.6, 1.6e-05, 0.00097, 0.00841, 1.5708)
+}
+
+}
+\references{
+\itemize{
+\item Mukherjee, H., and J. P. Brill. 1985. Pressure Drop Correlations for Inclined Two-Phase Flow. Journal of Energy Resources Technology, Transactions of the ASME 107 (4)
+\item Mukherjee, Hemanta, and James P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
 }
 }
