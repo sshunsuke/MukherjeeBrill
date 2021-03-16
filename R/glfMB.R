@@ -73,9 +73,20 @@ g <- 9.8    # Gravitational acceleration (m/s2)
 #' * Mukherjee, Hemanta, and James P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
 #'
 #' @examples
-#' \dontrun{
-#'   exec_glfMB(1.18, 1.21, 0.152, 94.2, 762.6, 1.6e-05, 0.00097, 0.00841, 1.5708)
-#' }
+#' # This example is from Brill and Mukherjee (1999) "Multiphase Flow in Wells"
+#' vsG <- 3.86 * 0.3048    # 3.86 ft/s
+#' vsL <- 3.97 * 0.3048    # 3.97 ft/s
+#' D   <- 6 * 0.0254       # 6 inch
+#' densityG <- 5.88 * 16.01845     # 5.88 lbm/ft3  - (1 lbm/ft3 = 16.01845 kg/m3)
+#' densityL <- 47.61 * 16.01845    # 47.61 lbm/ft3 - (1 lbm/ft3 = 16.01845 kg/m3)
+#' viscosityG <- 0.016 / 1000      # 0.016 cp
+#' viscosityL <- 0.97  / 1000      # 0.970 cp
+#' surfaceTension <- 8.41 / 1000   # 8.41 dynes/cm
+#' angle <- pi/2                   # 90 deg
+#' 
+#' # Results should be 3 (slug), 0.560, and 4710 Pa (= 0.209 psi/ft)
+#' exec_glfMB(vsG, vsL, D, densityG, densityL,
+#'            viscosityG, viscosityL, surfaceTension, angle)
 #'
 #' @note You can execute the calculation step by step without this function if want. Below is an example.
 #' ```
