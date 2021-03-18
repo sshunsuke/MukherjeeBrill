@@ -105,35 +105,59 @@ call_MB <- function(vsG, vsL, D, densityG, densityL,
 
 # developing function
 
-# Generate a flow regime map
-#
-# Range of the map is specified by `vector_vsG` and `vector_vsL`.
-#
-#
-# flow_regime_map_MB(1:10, 1:10, 0.1, 40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2, TRUE)
-#
-flow_regime_map_MB <- function(vector_vsG, vector_vsL, D, densityG, densityL,
-                               viscosityG, viscosityL, surfaceTension, angle,
-                               plotting=FALSE) {
+#' Generate flow regime map (frm) data
+#'
+#' Generate data (matrix) for flow regime map. Range of the map is specified by `vector_vsG` and `vector_vsL`.
+#'
+#' @param vector_vsG Vector of Superficial velocity of gas - m/s
+#' @param vector_vsL Vector of superficial velocity of liquid - m/s
+#' @param D Pipe diameter - m
+#' @param densityG Density of gas - kg/m3
+#' @param densityL Density of liquid - kg/m3
+#' @param viscosityG Visosity of gas - Pa-s
+#' @param viscosityL Visosity of liquid - Pa-s
+#' @param surfaceTension Surface tension - N/m
+#' @param angle Pipe angle (0 is horizontal flow) - radian
+#'
+#' @return A matrix (class="frm_MB") including the information of flow regime at
+#' specified superfical velocities of gas and liquid.
+#' * `vsG`: Superficial velocity of gas
+#' * `vsL`: Superficial velocity of liquid
+#' * `fr`: Flow regime (1: Stratified, 2: Annular, 3: Slug, and 4: Bubbly)
+#' * `NGv`, `NLv`, `NL`, `NGvSM`, `NGvBS`, `NLvBS_up`, `NLvST`: Properties used in model
+#'
+#' @example
+#' vs_range = glfMB:::frm_vs_range(0.1, 10, 20, TRUE)
+#' frm <- generate_frm_MB(vs_range, vs_range, 0.1, 40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
+#' plot.frm_MB(frm)
+#'
+#' @export
+#' @md
+generate_frm_MB <- function(vector_vsG, vector_vsL, D, densityG, densityL,
+                            viscosityG, viscosityL, surfaceTension, angle) {
   pairs_vs <- expand.grid(vector_vsG, vector_vsL)
-  ret <- glfMB:::frm0_MB(pairs_vs[,1], pairs_vs[,2], D, densityG, densityL,
+  frm <- glfMB:::frm0_MB(pairs_vs[,1], pairs_vs[,2], D, densityG, densityL,
                          viscosityG, viscosityL, surfaceTension, angle)
 
-  if (plotting == TRUE) {
-    cstr <- c('H', 'A', 'S', 'B')
-    ccol <- c('black', 'red', 'green', 'blue')
+  #if (plotting == TRUE) {
+  #  glfMB:::plot_flow_regime_map(frm)
+  #}
 
-    plot(c(min(ret[,'vsG']), max(ret[,'vsG'])), c(min(ret[,'vsL']), max(ret[,'vsL'])),
-         type="n", xlab="vsG [m/s]", ylab="vsL [m/s]")
-    for (i in 1:nrow(ret)) {
-      fr <- ret[i,'fr']
-      points(ret[i,'vsG'], ret[i,'vsL'], pch=cstr[fr], col=ccol[fr])
-    }
-  }
-
-  ret
+  frm
 }
 
+
+frm_vs_range <- function(min_, max_, np, log_scale) {
+  log_scale <- ifelse(missing(log_scale), FALSE, log_scale)
+
+  if (log_scale == TRUE) {
+    ret <- seq(log10(min_), log10(max_), length.out = np)
+    ret <- 10^(ret)
+  } else {
+    ret <- seq(min_, max_, length.out = np)
+  }
+  ret
+}
 
 
 # developing function
@@ -141,10 +165,49 @@ frm0_MB <- function(vsG, vsL, D, densityG, densityL,
                     viscosityG, viscosityL, surfaceTension, angle) {
   dlns <- dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
   fr   <- flow_regime_MB(dlns)
-  cbind('vsG'=vsG, 'vsL'=vsL, 'fr'=fr, 'NGv'=dlns$NGv, 'NLv'=dlns$NLv)
+  frm <- cbind('vsG'=vsG, 'vsL'=vsL, 'fr'=fr,
+               'NGv'=dlns$NGv, 'NLv'=dlns$NLv, "NL"=dlns$NL,
+               'NGvSM'=dlns$NGvSM, 'NGvBS'=dlns$NGvBS, 'NLvBS_up'=dlns$NLvBS_up, 'NLvST'=dlns$NLvST)
+  class(frm) <- "frm_MB"
+  frm
 }
 
 
+
+#' Plot a flow regime map
+#'
+#' @param x Flow regime map data created by `generate_frm_MB()`
+#' @param xlab label x (optional)
+#' @param ylab label y (optional)
+#' @param xval 'vsG' or 'NGv' (optional)
+#' @param yval 'vsL' or 'NLv' (optional)
+#' @param ... graphical parameters to plot
+#'
+#' @examples # plot(a)
+#'
+#' @importFrom graphics plot points
+#'
+#' @rdname plot.frm_MB
+#' @export
+plot.frm_MB <- function(x, xlab, ylab, xval='vsG', yval='vsL', ...) {
+  #axis_log <- ifelse(missing(axis_log), FALSE, axis_log)
+
+  xlab <- ifelse(missing(xlab), xval, xlab)
+  ylab <- ifelse(missing(ylab), yval, ylab)
+
+  plot(c(min(x[,xval]), max(x[,xval])), c(min(x[,yval]), max(x[,yval])),
+       type="n", xlab=xlab, ylab=ylab, ...)
+
+  st <- which(x[,'fr'] == 1)
+  an <- which(x[,'fr'] == 2)
+  sl <- which(x[,'fr'] == 3)
+  bl <- which(x[,'fr'] == 4)
+
+  points(x[st, xval], x[st, yval], pch='s', col='black')
+  points(x[an, xval], x[an, yval], pch='A', col='red')
+  points(x[sl, xval], x[sl, yval], pch='S', col='green')
+  points(x[bl, xval], x[bl, yval], pch='B', col='blue')
+}
 
 
 
