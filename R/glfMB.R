@@ -416,7 +416,7 @@ flow_regime_MB_core <- function(NGv, NLv, angle, NGvSM, NGvBS, NLvBS_up, NLvST) 
     } else {
       flowRegime <- 3  # slug
     }
-  } else if (abs(angle) > glfMB:::deg2rad(-30)) {
+  } else if (abs(angle) > glfMB:::deg2rad(30)) {
     # Downhill
     if (NGv > NGvBS) {
       if (NLv > NLvST) {
