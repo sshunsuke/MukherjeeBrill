@@ -4,14 +4,14 @@
 \alias{Colebrook}
 \title{Colebrook correlation for the Darcy friction factor}
 \usage{
-Colebrook(roughness, D, Re, tol = 1e-08, itMax = 10, warn = TRUE)
+Colebrook(Re, roughness, D, tol = 1e-08, itMax = 10, warn = TRUE)
 }
 \arguments{
+\item{Re}{Reynold number}
+
 \item{roughness}{Pipe roughness}
 
 \item{D}{Pipe diameter}
-
-\item{Re}{Reynold number}
 
 \item{tol}{Tolerance in Newton-Raphson method (optional)}
 

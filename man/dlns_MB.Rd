@@ -44,6 +44,17 @@ Return the dimensionless groups proposed by Duns & Ros:
 }
 \examples{
 \dontrun{
-dlns_MB(1.18, 1.21, 0.152, 94.2, 762.6, 1.6e-05, 0.00097, 0.00841, 1.5708)
+vsG <- 3.86 * 0.3048    # 3.86 ft/s
+vsL <- 3.97 * 0.3048    # 3.97 ft/s
+D   <- 6 * 0.0254       # 6 inch
+densityG <- 5.88 * 16.01845     # 5.88 lbm/ft3  - (1 lbm/ft3 = 16.01845 kg/m3)
+densityL <- 47.61 * 16.01845    # 47.61 lbm/ft3 - (1 lbm/ft3 = 16.01845 kg/m3)
+viscosityG <- 0.016 / 1000      # 0.016 cp
+viscosityL <- 0.97  / 1000      # 0.970 cp
+surfaceTension <- 8.41 / 1000   # 8.41 dynes/cm
+angle <- pi/2                   # 90 deg
+
+#  NLv=11.84, NGv=11.54, NGvSM=350.8, NLvBS_up=18.40, NL=0.0118
+dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
 }
 }

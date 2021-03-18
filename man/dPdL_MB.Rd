@@ -4,7 +4,7 @@
 \alias{dPdL_MB}
 \title{Calculate pressure drop (dP/L)}
 \usage{
-dPdL_MB(DLNs, flowRegime, HL, pressure)
+dPdL_MB(DLNs, flowRegime, HL, roughness, pressure, debug = FALSE)
 }
 \arguments{
 \item{DLNs}{dimensionless numbers calculated by \code{dlns_MB()}}
@@ -13,7 +13,11 @@ dPdL_MB(DLNs, flowRegime, HL, pressure)
 
 \item{HL}{Holdup}
 
-\item{pressure}{Pressure}
+\item{roughness}{Pipe roughness}
+
+\item{pressure}{Pressure (optional)}
+
+\item{debug}{If TRUE, print parameters (usually set to FALSE)}
 }
 \value{
 pressure drop (Pa/m)
