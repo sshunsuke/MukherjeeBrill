@@ -2,7 +2,7 @@
 % Please edit documentation in R/glfMB.R
 \name{call_MB}
 \alias{call_MB}
-\title{Call core functions of Mukherjee & Brill model}
+\title{Calculate flow regime, holdup, and pressure drop with the model of Mukherjee and Brill (1985)}
 \usage{
 call_MB(vsG, vsL, D, densityG, densityL,
         viscosityG, viscosityL, surfaceTension,
@@ -27,7 +27,7 @@ call_MB(vsG, vsL, D, densityG, densityL,
 
 \item{angle}{Pipe angle (0 is horizontal flow) - radian}
 
-\item{roughness}{Pipe roughness}
+\item{roughness}{Pipe roughness - m}
 
 \item{pressure}{Pressure (optional) - Pa}
 }
@@ -40,14 +40,15 @@ Data frame including following data:
 }
 }
 \description{
-Calculate flow regime, holdup, and pressure drop with the model of Mukherjee and Brill (1985).
+Call the core functions of Mukherjee & Brill model: \code{dlns_MB()}, \code{flow_regime_MB()}, \code{holdup_MB()}, and \code{dPdL_MB()}.
 The last argument (\code{pressure}) is for consideration of accelaration, which you can ignore.
 }
 \note{
-You can execute the calculation step by step without this function if want. Below is an example.\preformatted{  dlns <- dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
-  fr   <- flow_regime_MB(dlns)
-  hl <- holdup_MB(dlns, fr)
-  dPdL <- dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
+You can execute the calculation step by step without this function if want. Below is an example.\preformatted{dlns <- dlns_MB(vsG, vsL, D, densityG, densityL,
+                viscosityG, viscosityL, surfaceTension, angle)
+fr   <- flow_regime_MB(dlns)
+hl <- holdup_MB(dlns, fr)
+dPdL <- dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
 }
 }
 \examples{
@@ -64,7 +65,7 @@ angle <- pi/2                   # 90 deg
 roughness <- 0.00006 * 0.3048   # 0.00006 ft
 pressure <- 1700 * 6894.76      # 1700 psia (Example 3.2)
 
-# Results should be 3 (slug), 0.560, and 4727 Pa/m (= 0.209 psi/ft)
+# Results should be 3 (slug), 0.560, and about 4727 Pa/m (= 0.209 psi/ft)
 call_MB(vsG, vsL, D, densityG, densityL,
         viscosityG, viscosityL, surfaceTension,
         angle, roughness, pressure)

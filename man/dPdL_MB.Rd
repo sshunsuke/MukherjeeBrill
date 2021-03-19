@@ -2,7 +2,7 @@
 % Please edit documentation in R/glfMB.R
 \name{dPdL_MB}
 \alias{dPdL_MB}
-\title{Calculate pressure drop (dP/L)}
+\title{Low-level function to calculate pressure drop (dP/L)}
 \usage{
 dPdL_MB(DLNs, flowRegime, HL, roughness, pressure, debug = FALSE)
 }
@@ -23,5 +23,5 @@ dPdL_MB(DLNs, flowRegime, HL, roughness, pressure, debug = FALSE)
 pressure drop (Pa/m)
 }
 \description{
-Calculate pressure drop (dP/L)
+Low-level function to calculate pressure drop (dP/L)
 }

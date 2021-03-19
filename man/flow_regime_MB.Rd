@@ -2,7 +2,7 @@
 % Please edit documentation in R/glfMB.R
 \name{flow_regime_MB}
 \alias{flow_regime_MB}
-\title{Determine flow regime}
+\title{Low-level function to determine flow regime}
 \usage{
 flow_regime_MB(DLNs)
 }

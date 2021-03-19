@@ -2,7 +2,7 @@
 % Please edit documentation in R/glfMB.R
 \name{holdup_MB}
 \alias{holdup_MB}
-\title{Calculate holdup}
+\title{Low-level function to calculate holdup}
 \usage{
 holdup_MB(DLNs, flowRegime)
 }
@@ -15,5 +15,5 @@ holdup_MB(DLNs, flowRegime)
 holdup
 }
 \description{
-Calculate holdup
+Low-level function to calculate holdup
 }

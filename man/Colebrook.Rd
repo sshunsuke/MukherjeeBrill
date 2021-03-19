@@ -23,5 +23,6 @@ Colebrook(Re, roughness, D, tol = 1e-08, itMax = 10, warn = TRUE)
 Darcy friction factor
 }
 \description{
-Calculate the Darcy friction factor with assuming a smooth pipe
+Calculate the Darcy friction factor with the Colebrook correlation.
+As the correlation cannot be resolved explicitly, Newton-Raphson is used.
 }

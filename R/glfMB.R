@@ -18,8 +18,6 @@ NULL
 #
 #
 
-
-
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 # Constants ----
 # * pi ----
@@ -33,9 +31,9 @@ g <- 9.8    # Gravitational acceleration (m/s2)
 # Facade ----
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#' Call core functions of Mukherjee & Brill model
+#' Calculate flow regime, holdup, and pressure drop with the model of Mukherjee and Brill (1985)
 #'
-#' Calculate flow regime, holdup, and pressure drop with the model of Mukherjee and Brill (1985).
+#' Call the core functions of Mukherjee & Brill model: `dlns_MB()`, `flow_regime_MB()`, `holdup_MB()`, and `dPdL_MB()`.
 #' The last argument (`pressure`) is for consideration of accelaration, which you can ignore.
 #'
 #' @usage call_MB(vsG, vsL, D, densityG, densityL,
@@ -51,7 +49,7 @@ g <- 9.8    # Gravitational acceleration (m/s2)
 #' @param viscosityL Visosity of liquid - Pa-s
 #' @param surfaceTension Surface tension - N/m
 #' @param angle Pipe angle (0 is horizontal flow) - radian
-#' @param roughness Pipe roughness
+#' @param roughness Pipe roughness - m
 #' @param pressure Pressure (optional) - Pa
 #'
 #' @return Data frame including following data:
@@ -77,17 +75,18 @@ g <- 9.8    # Gravitational acceleration (m/s2)
 #' roughness <- 0.00006 * 0.3048   # 0.00006 ft
 #' pressure <- 1700 * 6894.76      # 1700 psia (Example 3.2)
 #'
-#' # Results should be 3 (slug), 0.560, and 4727 Pa/m (= 0.209 psi/ft)
+#' # Results should be 3 (slug), 0.560, and about 4727 Pa/m (= 0.209 psi/ft)
 #' call_MB(vsG, vsL, D, densityG, densityL,
 #'         viscosityG, viscosityL, surfaceTension,
 #'         angle, roughness, pressure)
 #'
 #' @note You can execute the calculation step by step without this function if want. Below is an example.
 #' ```
-#'   dlns <- dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
-#'   fr   <- flow_regime_MB(dlns)
-#'   hl <- holdup_MB(dlns, fr)
-#'   dPdL <- dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
+#' dlns <- dlns_MB(vsG, vsL, D, densityG, densityL,
+#'                 viscosityG, viscosityL, surfaceTension, angle)
+#' fr   <- flow_regime_MB(dlns)
+#' hl <- holdup_MB(dlns, fr)
+#' dPdL <- dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
 #' ```
 #'
 #' @export
@@ -103,7 +102,6 @@ call_MB <- function(vsG, vsL, D, densityG, densityL,
 }
 
 
-# developing function
 
 #' Generate flow regime map (frm) data
 #'
@@ -126,10 +124,10 @@ call_MB <- function(vsG, vsL, D, densityG, densityL,
 #' * `fr`: Flow regime (1: Stratified, 2: Annular, 3: Slug, and 4: Bubbly)
 #' * `NGv`, `NLv`, `NL`, `NGvSM`, `NGvBS`, `NLvBS_up`, `NLvST`: Properties used in model
 #'
-#' @example
+#' @examples
 #' vs_range = glfMB:::frm_vs_range(0.1, 10, 20, TRUE)
 #' frm <- generate_frm_MB(vs_range, vs_range, 0.1, 40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
-#' plot.frm_MB(frm)
+#' glfMB:::plot.frm_MB(frm)
 #'
 #' @export
 #' @md
@@ -230,6 +228,33 @@ deg2rad = function(deg) { deg * pi / 180 }
 
 
 
+data_for_example_MB <- function() {
+  
+  list(
+    # Kerosene
+    Kerosene_surfaceTension = function(C) { (27.6 - 0.09 * C) / 1000 },     # N/m
+    Kerosene_density = function(C) { 832.34 - 0.8333 * C },                 # kg/m3
+    Kerosene_viscosity = function(C) { 1e-03 * exp(1.0664 - 0.0207 * C) },  # Pa
+    
+    # Lubricating Oil
+    Lubricating_surfaceTension = function(C) { (36.6094 - 0.117 * C) / 1000 },    # N/m
+    Lubricating_density = function(C) { 861.22 - 0.7585 * C },                    # kg/m3
+    Lubricating_viscosity = function(C) { 1e-03 * exp(3.99 - 0.0412 * C) },       # Pa
+    
+    # Air (regarded as ideal gas)
+    Air_density = function(C, P) {
+      K <- C + 273.15    # temperature (K)
+      M <- 28.96 / 1000  # Molar mass of air (kg/mol)
+      R <- 8.314         # Gas constant
+      P * M / (R * K)
+    },
+    Air_viscosity = function(C) { 1.81 * 10^(-5)}
+  )
+  
+  
+}
+
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 # Darcy friction factor ----
@@ -250,7 +275,8 @@ Blasius <- function(Re) {
 
 #' Colebrook correlation for the Darcy friction factor
 #'
-#' Calculate the Darcy friction factor with assuming a smooth pipe
+#' Calculate the Darcy friction factor with the Colebrook correlation.
+#' As the correlation cannot be resolved explicitly, Newton-Raphson is used.
 #'
 #' @param Re Reynold number
 #' @param roughness Pipe roughness
@@ -338,7 +364,7 @@ Darcy_friction_factor <- function(Re, roughness, D, tol=1e-8, itMax=10) {
 # Dimensionless groups proposed by Duns & Ros ----
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#' Calculate dimensionless numbers
+#' Low-level function to calculate dimensionless numbers
 #'
 #' Return the dimensionless groups proposed by Duns & Ros:
 #' * `NLv`: Liquid velocity number
@@ -435,7 +461,7 @@ dlns_MB <- function(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, sur
 # Flow regime ----
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#' Determine flow regime
+#' Low-level function to determine flow regime
 #'
 #' There are four types of defined flow regime:
 #' * 1: Stratified
@@ -511,7 +537,7 @@ flow_regime_MB_core <- function(NGv, NLv, angle, NGvSM, NGvBS, NLvBS_up, NLvST) 
 # Liquid holdup    ----
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#' Calculate holdup
+#' Low-level function to calculate holdup
 #'
 #' @param DLNs dimensionless numbers calculated by `dlns_MB()`
 #' @param flowRegime flow regime estimated by `flow_regime_MB()`
@@ -556,7 +582,7 @@ holdup_MB_core <- function(angle, NL, NGv, NLv, flowRegime) {
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-#' Calculate pressure drop (dP/L)
+#' Low-level function to calculate pressure drop (dP/L)
 #'
 #' @param DLNs dimensionless numbers calculated by `dlns_MB()`
 #' @param flowRegime flow regime estimated by `flow_regime_MB()`

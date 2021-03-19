@@ -2,7 +2,7 @@
 % Please edit documentation in R/glfMB.R
 \name{dlns_MB}
 \alias{dlns_MB}
-\title{Calculate dimensionless numbers}
+\title{Low-level function to calculate dimensionless numbers}
 \usage{
 dlns_MB(vsG, vsL, D, densityG, densityL,
         viscosityG, viscosityL, surfaceTension, angle)
