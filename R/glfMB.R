@@ -228,30 +228,60 @@ deg2rad = function(deg) { deg * pi / 180 }
 
 
 
-data_for_example_MB <- function() {
+
+#' Get a list of functions for test (and example)
+#' 
+#' This function returns a list of functions for fluid properties (see also Value).
+#' 
+#' @return a list of functions for fluid properties. SI unit is used in the functions. 
+#' * Kerosene_surfaceTension(temperature) - K
+#' * Kerosene_density(temperature) - K
+#' * Kerosene_viscosity(temperature) - K
+#' * Lubricating_surfaceTension(temperature) - K
+#' * Lubricating_density(temperature) - K
+#' * Lubricating_viscosity(temperature) - K
+#' * Air_density(temperature, pressure) - K, Pa
+#' * Air_viscosity(temperature, pressure) - K, Pa
+#' 
+#' @examples td <- testdata_MB()
+#' td$Kerosene_viscosity(283.15)     # Kerosene Viscosity at 10 degC
+#' td$Air_density(293.15, 5*100000)  # Air density at 20 degC and 5 bar
+#'
+#' @export
+#' @md
+testdata_MB <- function() {
   
   list(
-    # Kerosene
-    Kerosene_surfaceTension = function(C) { (27.6 - 0.09 * C) / 1000 },     # N/m
-    Kerosene_density = function(C) { 832.34 - 0.8333 * C },                 # kg/m3
-    Kerosene_viscosity = function(C) { 1e-03 * exp(1.0664 - 0.0207 * C) },  # Pa
+    # Kerosene (Mukherjee & Brill, 1985)
+    Kerosene_surfaceTension = function(temperature) {
+      (27.6 - 0.09 * (temperature-273.15)) / 1000           # N/m
+    },
+    Kerosene_density = function(temperature) {
+      832.34 - 0.8333 * (temperature-273.15)                # kg/m3
+    },
+    Kerosene_viscosity = function(temperature) {
+      1e-03 * exp(1.0664 - 0.0207 * (temperature-273.15))   # Pa
+    },
     
-    # Lubricating Oil
-    Lubricating_surfaceTension = function(C) { (36.6094 - 0.117 * C) / 1000 },    # N/m
-    Lubricating_density = function(C) { 861.22 - 0.7585 * C },                    # kg/m3
-    Lubricating_viscosity = function(C) { 1e-03 * exp(3.99 - 0.0412 * C) },       # Pa
+    # Lubricating Oil (Mukherjee & Brill, 1985)
+    Lubricating_surfaceTension = function(temperature) {
+      (36.6094 - 0.117 * (temperature-273.15)) / 1000       # N/m
+    },
+    Lubricating_density = function(temperature) {
+      861.22 - 0.7585 * (temperature-273.15)                # kg/m3
+    },
+    Lubricating_viscosity = function(temperature) {
+      1e-03 * exp(3.99 - 0.0412 * (temperature-273.15))     # Pa
+    },
     
     # Air (regarded as ideal gas)
-    Air_density = function(C, P) {
-      K <- C + 273.15    # temperature (K)
+    Air_density = function(temperature, pressure) {
       M <- 28.96 / 1000  # Molar mass of air (kg/mol)
       R <- 8.314         # Gas constant
-      P * M / (R * K)
+      pressure * M / (R * temperature)
     },
-    Air_viscosity = function(C) { 1.81 * 10^(-5)}
+    Air_viscosity = function(temperature, pressure) { 1.81 * 10^(-5)}
   )
-  
-  
 }
 
 
