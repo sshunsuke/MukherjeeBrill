@@ -25,23 +25,13 @@ NULL
 
 g <- 9.8    # Gravitational acceleration (m/s2)
 
-# developing function
-frm0_MB <- function(vsG, vsL, D, densityG, densityL,
-                    viscosityG, viscosityL, surfaceTension, angle) {
-  dlns <- dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
-  fr   <- flow_regime_MB(dlns)
-  frm <- cbind('vsG'=vsG, 'vsL'=vsL, 'fr'=fr,
-               'NGv'=dlns$NGv, 'NLv'=dlns$NLv, "NL"=dlns$NL,
-               'NGvSM'=dlns$NGvSM, 'NGvBS'=dlns$NGvBS, 'NLvBS_up'=dlns$NLvBS_up, 'NLvST'=dlns$NLvST)
-  class(frm) <- "frm_MB"
-  frm
-}
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - -
-# Utilities ----
+# Utilities (not exported) ----
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 
-circle_area = function(r) { r * r * pi }
+circle_area = function(D) { (D/2)^2 * pi }
 
 Reynolds <- function(density, v, D, viscosity) {
   density * v * D / viscosity
@@ -97,13 +87,15 @@ laminar <- function(Re) {
 
 transition <- function(Re, roughness, D, tol=1e-8, itMax=10, warn=TRUE) {
   fl <- glfMB:::laminar(Re)
-  ft <- glfMB:::Colebrook(Re, roughness, D)
+  ft <- glfMB:::Colebrook(Re, roughness, D, warn=FALSE)
 
   (fl * (4000 - Re) + ft * (Re - 2000)) / 2000
 }
 
 
-#' Calculate the Darcy friction factor
+#' Low-level function to calculate the Darcy friction factor
+#' 
+#' Calculate the Darcy friction factor considering pipe roughness. 
 #'
 #' @param Re Reynold number
 #' @param roughness Pipe roughness
@@ -113,9 +105,9 @@ transition <- function(Re, roughness, D, tol=1e-8, itMax=10, warn=TRUE) {
 #'
 #' @return Darcy friction factor
 #' @export
-Darcy_friction_factor <- function(Re, roughness, D, tol=1e-8, itMax=10) {
+l_Darcy_friction_factor <- function(Re, roughness, D, tol=1e-8, itMax=10) {
   if (Re >= 4000) {
-    ret <- glfMB:::Colebrook(Re, roughness, D, warn=FALSE)
+    ret <- glfMB:::Colebrook(Re, roughness, D)
   } else if (Re <= 2000) {
     ret <- glfMB:::laminar(Re, roughness, D)
   } else {
@@ -153,8 +145,8 @@ Darcy_friction_factor <- function(Re, roughness, D, tol=1e-8, itMax=10) {
 #'
 #' @return Data frame of dimensionless numbers (`NLv`, `NGv`, `Nd`, `NL`, `NGvSM`, `NLvBS`, `NGvBS_up`, and `NLvST`) and input values
 #'
-#' @usage dlns_MB(vsG, vsL, D, densityG, densityL,
-#'         viscosityG, viscosityL, surfaceTension, angle)
+#' @usage l_dlns_MB(vsG, vsL, D, densityG, densityL,
+#'           viscosityG, viscosityL, surfaceTension, angle)
 #'
 #' @examples
 #' \dontrun{
@@ -168,13 +160,13 @@ Darcy_friction_factor <- function(Re, roughness, D, tol=1e-8, itMax=10) {
 #' surfaceTension <- 8.41 / 1000   # 8.41 dynes/cm
 #' angle <- pi/2                   # 90 deg
 #'
-#' #  NLv=11.84, NGv=11.54, NGvSM=350.8, NLvBS_up=18.40, NL=0.0118
-#' dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
+#' #  NLv=11.87, NGv=11.54, NGvSM=350.8, NLvBS_up=18.40, NL=0.0118
+#' l_dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
 #' }
 #' @export
 #' @md
 
-dlns_MB <- function(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle) {
+l_dlns_MB <- function(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle) {
   g <- glfMB:::g
 
   NLv <- vsL * (densityL / g / surfaceTension)^(0.25)
@@ -234,12 +226,12 @@ dlns_MB <- function(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, sur
 #' * 3: Slug
 #' * 4: Bubbly
 #'
-#' @param DLNs Dimensionless numbers calculated by `dlns_MB()`
+#' @param DLNs Dimensionless numbers calculated by `l_dlns_MB()`
 #' @return a vector of numbers indicating flow regime (1: Stratified, 2: Annular, 3: Slug, and 4: Bubbly)
 #' @export
 #' @md
-flow_regime_MB <- function(DLNs) {
-  mapply(glfMB:::flow_regime_MB_core,
+l_flow_regime_MB <- function(DLNs) {
+  mapply(glfMB:::l_flow_regime_MB_core,
          DLNs$NGv, DLNs$NLv, DLNs$angle, DLNs$NGvSM, DLNs$NGvBS, DLNs$NLvBS_up, DLNs$NLvST)
 }
 
@@ -256,7 +248,7 @@ flow_regime_MB <- function(DLNs) {
 # @param NLvST Stratified (Downflow)
 #
 # @return a number indicating flow regime
-flow_regime_MB_core <- function(NGv, NLv, angle, NGvSM, NGvBS, NLvBS_up, NLvST) {
+l_flow_regime_MB_core <- function(NGv, NLv, angle, NGvSM, NGvBS, NLvBS_up, NLvST) {
   flowRegime <- 2  # annular
 
   if (NGv > NGvSM) {
@@ -304,19 +296,19 @@ flow_regime_MB_core <- function(NGv, NLv, angle, NGvSM, NGvBS, NLvBS_up, NLvST) 
 
 #' Low-level function to calculate holdup
 #'
-#' @param DLNs dimensionless numbers calculated by `dlns_MB()`
-#' @param flowRegime flow regime estimated by `flow_regime_MB()`
+#' @param DLNs dimensionless numbers calculated by `l_dlns_MB()`
+#' @param flowRegime flow regime estimated by `l_flow_regime_MB()`
 #' @return holdup
 #' @export
 #' @md
-holdup_MB <- function(DLNs, flowRegime) {
-  mapply(glfMB:::holdup_MB_core,
+l_holdup_MB <- function(DLNs, flowRegime) {
+  mapply(glfMB:::l_holdup_MB_core,
          DLNs$angle, DLNs$NL, DLNs$NGv, DLNs$NLv, flowRegime)
 }
 
 # Core logic to calculate holdup
 #
-# Internal function, called from `holdup_MB()`
+# Internal function, called by `l_holdup_MB()`.
 #
 # @param angle Pipe angle (radian)
 # @param NL a
@@ -324,7 +316,7 @@ holdup_MB <- function(DLNs, flowRegime) {
 # @param NLv c
 # @param flowRegime d
 # @return holdup
-holdup_MB_core <- function(angle, NL, NGv, NLv, flowRegime) {
+l_holdup_MB_core <- function(angle, NL, NGv, NLv, flowRegime) {
   # coefficients
   co <- cbind(
     c(-0.380113, 0.129875, -0.119788,  2.343227, 0.475686, 0.288657),   # Up
@@ -348,8 +340,8 @@ holdup_MB_core <- function(angle, NL, NGv, NLv, flowRegime) {
 
 #' Low-level function to calculate pressure drop (dP/L)
 #'
-#' @param DLNs dimensionless numbers calculated by `dlns_MB()`
-#' @param flowRegime flow regime estimated by `flow_regime_MB()`
+#' @param DLNs dimensionless numbers calculated by `l_dlns_MB()`
+#' @param flowRegime flow regime estimated by `l_flow_regime_MB()`
 #' @param HL Holdup
 #' @param roughness Pipe roughness
 #' @param pressure Pressure (optional)
@@ -359,12 +351,12 @@ holdup_MB_core <- function(angle, NL, NGv, NLv, flowRegime) {
 #'
 #' @export
 #' @md
-dPdL_MB <- function(DLNs, flowRegime, HL, roughness, pressure, debug=FALSE) {
+l_dPdL_MB <- function(DLNs, flowRegime, HL, roughness, pressure, debug=FALSE) {
   if (missing(pressure) == TRUE) {
     pressure <- NA
   }
 
-  t(mapply(glfMB:::dPdL_core_MB,
+  t(mapply(glfMB:::l_dPdL_core_MB,
            DLNs$D, DLNs$vsG, DLNs$vsL, DLNs$densityG, DLNs$densityL,
            DLNs$viscosityG, DLNs$viscosityL, DLNs$angle,
            flowRegime, HL, roughness, pressure, debug))
@@ -383,7 +375,7 @@ ffRatio <- (function(){
 })()
 
 
-dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosityL, angle,
+l_dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosityL, angle,
                          flowRegime, HL, roughness, pressure, debug) {
   g <- glfMB:::g
 
@@ -396,8 +388,8 @@ dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosityL
     delta <- f$root
 
     # Flow area of each phase
-    AL <- glfMB:::circle_area(D / 2) * HL         # (4.147)
-    AG <- glfMB:::circle_area(D / 2) * (1 - HL)
+    AL <- glfMB:::circle_area(D) * HL         # (4.147)
+    AG <- glfMB:::circle_area(D) * (1 - HL)
 
     # 4.146 for hL/d
     #   4.150 and 4.151
@@ -416,8 +408,8 @@ dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosityL
     ReG <- glfMB:::Reynolds(densityG, vG, dhG, viscosityG)   # (4.155)
     ReL <- glfMB:::Reynolds(densityL, vL, dhL, viscosityL)   # (4.154)
 
-    fDG <- glfMB:::Darcy_friction_factor(ReG, roughness, D)
-    fDL <- glfMB:::Darcy_friction_factor(ReL, roughness, D)
+    fDG <- glfMB:::l_Darcy_friction_factor(ReG, roughness, D)
+    fDL <- glfMB:::l_Darcy_friction_factor(ReL, roughness, D)
 
     shearStressG <- fDG * densityG * vG^2 / (2*g)    # 4.153
     shearStressL <- fDL * densityL * vL^2 / (2*g)    # 4.152
@@ -448,7 +440,7 @@ dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosityL
 
     if (flowRegime == 2) {
       # Annular
-      fn <- glfMB:::Darcy_friction_factor(ReN, roughness, D)    # no-slip friction factor
+      fn <- glfMB:::l_Darcy_friction_factor(ReN, roughness, D)    # no-slip friction factor
       HR <- HLnoslip / HL                    # (4.140)
       fR <- glfMB:::ffRatio(HR)              # friction factor ratio
       fD <- fn * fR                          # (4.141)
@@ -456,7 +448,7 @@ dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosityL
       dPdL <- (fD * densityMixS * vmix^2 / (2 * D) + densityMixS * g * sin(angle)) / (1 - Ek)  # (4.139)
     } else if (flowRegime == 3 | flowRegime == 4) {
       # Slug or Bubble
-      fD <- glfMB:::Darcy_friction_factor(ReN, roughness, D)
+      fD <- glfMB:::l_Darcy_friction_factor(ReN, roughness, D)
       dPdL <- (fD * densityMixS * vmix^2 / (2 * D) + densityMixS * g * sin(angle)) / (1 - Ek)  # (4.136)
     } else {
       # error!

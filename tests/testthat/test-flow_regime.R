@@ -22,9 +22,9 @@ test_that("Kerosene, -70 deg: Stratifired", {
   angle <- glfMB:::rad2deg(-70)
   NGv <- c(0.5,   5,  10, 1, 10, 2)
   NLv <- c(0.5, 0.5, 0.5, 1,  1, 2)
-  dlns <- dlns_MB(NGv/coefficient, NLv/coefficient,
+  dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
                   ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
-  fr <- flow_regime_MB(dlns)
+  fr <- l_flow_regime_MB(dlns)
   expect_equal(fr, rep(1, 6))
 })
 
@@ -32,9 +32,9 @@ test_that("Kerosene, -70 deg: Annular", {
   angle <- glfMB:::rad2deg(-70)
   NGv <- c( 50, 100, 200, 300)
   NLv <- c(0.1,  1,    5,  8)
-  dlns <- dlns_MB(NGv/coefficient, NLv/coefficient,
+  dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
                   ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
-  fr <- flow_regime_MB(dlns)
+  fr <- l_flow_regime_MB(dlns)
   expect_equal(fr, rep(2, 4))
 })
 
@@ -42,9 +42,9 @@ test_that("Kerosene, -70 deg: Slug", {
   angle <- glfMB:::rad2deg(-70)
   NGv <- c(10, 20, 20, 100)
   NLv <- c(10,  5, 10,   2)
-  dlns <- dlns_MB(NGv/coefficient, NLv/coefficient,
-                  ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
-  fr <- flow_regime_MB(dlns)
+  dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
+                    ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
+  fr <- l_flow_regime_MB(dlns)
   expect_equal(fr, rep(3, 4))
 })
 
@@ -52,9 +52,9 @@ test_that("Kerosene, -70 deg: Bubble", {
   angle <- glfMB:::rad2deg(-70)
   NGv <- c(0.1, 0.1, 1, 10, 100)
   NLv <- c(0.5, 100, 5, 20,  50)
-  dlns <- dlns_MB(NGv/coefficient, NLv/coefficient,
+  dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
                   ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
-  fr <- flow_regime_MB(dlns)
+  fr <- l_flow_regime_MB(dlns)
   expect_equal(fr, rep(4, 5))
 })
 
@@ -97,9 +97,9 @@ test_that("Kerosene, 0 deg: Stratifired", {
   angle <- 0
   NGv <- c(0.1, 1, 10,  20)
   NLv <- c(  1, 1,  1, 0.5)
-  dlns <- dlns_MB(NGv/coefficient, NLv/coefficient,
+  dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
                   ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
-  fr <- flow_regime_MB(dlns)
+  fr <- l_flow_regime_MB(dlns)
   expect_equal(fr, rep(1, 4))
 })
 
@@ -107,9 +107,9 @@ test_that("Kerosene, 0 deg: Annular", {
   angle <- 0
   NGv <- c( 50, 100, 200)
   NLv <- c(0.2,   1,   5)
-  dlns <- dlns_MB(NGv/coefficient, NLv/coefficient,
+  dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
                   ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
-  fr <- flow_regime_MB(dlns)
+  fr <- l_flow_regime_MB(dlns)
   expect_equal(fr, rep(2, 3))
 })
 
@@ -117,9 +117,9 @@ test_that("Kerosene, 0 deg: Slug", {
   angle <- 0
   NGv <- c(5,   5, 20, 50, 100)
   NLv <- c(2, 100,  1,  1,   2)
-  dlns <- dlns_MB(NGv/coefficient, NLv/coefficient,
+  dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
                   ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
-  fr <- flow_regime_MB(dlns)
+  fr <- l_flow_regime_MB(dlns)
   expect_equal(fr, rep(3, 5))
 })
 
@@ -159,9 +159,9 @@ test_that("flow_regime_MB(): Kerosene, 70 deg, Annular", {
   angle <- glfMB:::rad2deg(70)
   NGv <- c( 50, 100, 200)
   NLv <- c(0.2,   1,   5)
-  dlns <- dlns_MB(NGv/coefficient, NLv/coefficient,
+  dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
                   ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
-  fr <- flow_regime_MB(dlns)
+  fr <- l_flow_regime_MB(dlns)
   expect_equal(fr, rep(2, 3))
 })
 
@@ -169,9 +169,9 @@ test_that("flow_regime_MB(): Kerosene, 70 deg, Slug", {
   angle <- glfMB:::rad2deg(70)
   NGv <- c(0.1, 1, 10,  50,  50)
   NLv <- c(0.2, 2, 20, 0.5, 100)
-  dlns <- dlns_MB(NGv/coefficient, NLv/coefficient,
-                  ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
-  fr <- flow_regime_MB(dlns)
+  dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
+                    ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
+  fr <- l_flow_regime_MB(dlns)
   expect_equal(fr, rep(3, 5))
 })
 
@@ -179,9 +179,9 @@ test_that("flow_regime_MB(): Kerosene, 70 deg, Bubble", {
   angle <- glfMB:::rad2deg(-70)
   NGv <- c(0.1, 1, 10, 50)
   NLv <- c(0.5, 5, 50, 200)
-  dlns <- dlns_MB(NGv/coefficient, NLv/coefficient,
+  dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
                   ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
-  fr <- flow_regime_MB(dlns)
+  fr <- l_flow_regime_MB(dlns)
   expect_equal(fr, rep(4, 4))
 })
 

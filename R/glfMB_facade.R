@@ -8,8 +8,8 @@
 
 #' Calculate flow regime, holdup, and pressure drop with the model of Mukherjee and Brill (1985)
 #'
-#' Call the core functions of Mukherjee & Brill model: `dlns_MB()`, `flow_regime_MB()`,
-#' `holdup_MB()`, and `dPdL_MB()` to calculate flow regime, holdup, and pressure drop.
+#' Call the core functions of Mukherjee & Brill model: `l_dlns_MB()`, `l_flow_regime_MB()`,
+#' `l_holdup_MB()`, and `l_dPdL_MB()` to calculate flow regime, holdup, and pressure drop.
 #' The last argument (`pressure`) is for consideration of accelaration, which you can ignore.
 #'
 #' @usage call_MB(vsG, vsL, D, densityG, densityL,
@@ -58,23 +58,23 @@
 #'
 #' @note You can execute the calculation step by step without this function if want. Below is an example.
 #' ```
-#' dlns <- dlns_MB(vsG, vsL, D, densityG, densityL,
-#'                 viscosityG, viscosityL, surfaceTension, angle)
-#' fr   <- flow_regime_MB(dlns)
-#' hl <- holdup_MB(dlns, fr)
-#' dPdL <- dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
+#' dlns <- l_dlns_MB(vsG, vsL, D, densityG, densityL,
+#'                   viscosityG, viscosityL, surfaceTension, angle)
+#' fr   <- l_flow_regime_MB(dlns)
+#' hl <- l_holdup_MB(dlns, fr)
+#' dPdL <- l_dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
 #' ```
 #'
 #' @export
 #' @md
 call_MB <- function(vsG, vsL, D, densityG, densityL,
                     viscosityG, viscosityL, surfaceTension, angle, roughness, pressure) {
-  dlns <- dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
-  fr   <- flow_regime_MB(dlns)
-  hl <- holdup_MB(dlns, fr)
-  dPdL <- dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
+  dlns <- l_dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
+  fr   <- l_flow_regime_MB(dlns)
+  hl <- l_holdup_MB(dlns, fr)
+  dPdL <- l_dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
   
-  cbind("fr" = fr, "hl" = hl, "dPdL" = as.vector(dPdL))
+  data.frame("fr" = fr, "hl" = hl, "dPdL" = as.vector(dPdL))
 }
 
 
@@ -101,7 +101,7 @@ call_MB <- function(vsG, vsL, D, densityG, densityL,
 #' * `NGv`, `NLv`, `NL`, `NGvSM`, `NGvBS`, `NLvBS_up`, `NLvST`: Properties used in model
 #'
 #' @examples
-#' vs_range = glfMB:::frm_vs_range(0.1, 10, 20, TRUE)
+#' vs_range = glfMB:::vs_vector_MB(0.1, 10, 20, TRUE)
 #' frm <- generate_frm_MB(vs_range, vs_range, 0.1, 40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
 #' glfMB:::plot.frm_MB(frm)
 #'
@@ -112,11 +112,17 @@ generate_frm_MB <- function(vector_vsG, vector_vsL, D, densityG, densityL,
   pairs_vs <- expand.grid(vector_vsG, vector_vsL)
   frm <- glfMB:::frm0_MB(pairs_vs[,1], pairs_vs[,2], D, densityG, densityL,
                          viscosityG, viscosityL, surfaceTension, angle)
-  
-  #if (plotting == TRUE) {
-  #  glfMB:::plot_flow_regime_map(frm)
-  #}
-  
+  frm
+}
+
+frm0_MB <- function(vsG, vsL, D, densityG, densityL,
+                    viscosityG, viscosityL, surfaceTension, angle) {
+  dlns <- l_dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
+  fr   <- l_flow_regime_MB(dlns)
+  frm <- cbind('vsG'=vsG, 'vsL'=vsL, 'fr'=fr,
+               'NGv'=dlns$NGv, 'NLv'=dlns$NLv, "NL"=dlns$NL,
+               'NGvSM'=dlns$NGvSM, 'NGvBS'=dlns$NGvBS, 'NLvBS_up'=dlns$NLvBS_up, 'NLvST'=dlns$NLvST)
+  class(frm) <- "frm_MB"
   frm
 }
 
@@ -137,8 +143,6 @@ generate_frm_MB <- function(vector_vsG, vector_vsL, D, densityG, densityL,
 #' @rdname plot.frm_MB
 #' @export
 plot.frm_MB <- function(x, xlab, ylab, xval='vsG', yval='vsL', ...) {
-  #axis_log <- ifelse(missing(axis_log), FALSE, axis_log)
-  
   xlab <- ifelse(missing(xlab), xval, xlab)
   ylab <- ifelse(missing(ylab), yval, ylab)
   
@@ -163,7 +167,7 @@ plot.frm_MB <- function(x, xlab, ylab, xval='vsG', yval='vsL', ...) {
 
 #' Blasius correlation for the Darcy friction factor
 #'
-#' Calculate the Darcy friction factor with assuming a smooth pipe
+#' Calculate the Darcy friction factor with assuming a smooth pipe.
 #'
 #' @param Re Reynold number
 #' @return Darcy friction factor
@@ -176,7 +180,7 @@ Blasius <- function(Re) {
 #' Colebrook correlation for the Darcy friction factor
 #'
 #' Calculate the Darcy friction factor with the Colebrook correlation.
-#' As the correlation cannot be resolved explicitly, Newton-Raphson is used.
+#' As the correlation cannot be resolved explicitly, Newton-Raphson method is used.
 #'
 #' @param Re Reynold number
 #' @param roughness Pipe roughness
@@ -196,20 +200,27 @@ Colebrook <- function(Re, roughness, D, tol=1e-8, itMax=10, warn=TRUE) {
 # Utilities ----
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 
-
-frm_vs_range <- function(min_, max_, np, log_scale) {
+#' Generate a vector of superficial velocities (vs)
+#' 
+#' @param vs_min minimum value of superficial velocities
+#' @param vs_max maximum value of superficial velocities
+#' @param num_points number of data points of the returned vector
+#' @param log_scale a
+#'
+#' @export
+vs_vector_MB <- function(vs_min, vs_max, num_points, log_scale) {
   log_scale <- ifelse(missing(log_scale), FALSE, log_scale)
   
+  stopifnot(vs_min < vs_max)
+  
   if (log_scale == TRUE) {
-    ret <- seq(log10(min_), log10(max_), length.out = np)
+    ret <- seq(log10(vs_min), log10(vs_max), length.out = num_points)
     ret <- 10^(ret)
   } else {
-    ret <- seq(min_, max_, length.out = np)
+    ret <- seq(vs_min, vs_max, length.out = num_points)
   }
   ret
 }
-
-
 
 
 #' Get a list of functions for test (and example)

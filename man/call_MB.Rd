@@ -40,16 +40,16 @@ Data frame including following data:
 }
 }
 \description{
-Call the core functions of Mukherjee & Brill model: \code{dlns_MB()}, \code{flow_regime_MB()},
-\code{holdup_MB()}, and \code{dPdL_MB()} to calculate flow regime, holdup, and pressure drop.
+Call the core functions of Mukherjee & Brill model: \code{l_dlns_MB()}, \code{l_flow_regime_MB()},
+\code{l_holdup_MB()}, and \code{l_dPdL_MB()} to calculate flow regime, holdup, and pressure drop.
 The last argument (\code{pressure}) is for consideration of accelaration, which you can ignore.
 }
 \note{
-You can execute the calculation step by step without this function if want. Below is an example.\preformatted{dlns <- dlns_MB(vsG, vsL, D, densityG, densityL,
-                viscosityG, viscosityL, surfaceTension, angle)
-fr   <- flow_regime_MB(dlns)
-hl <- holdup_MB(dlns, fr)
-dPdL <- dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
+You can execute the calculation step by step without this function if want. Below is an example.\preformatted{dlns <- l_dlns_MB(vsG, vsL, D, densityG, densityL,
+                  viscosityG, viscosityL, surfaceTension, angle)
+fr   <- l_flow_regime_MB(dlns)
+hl <- l_holdup_MB(dlns, fr)
+dPdL <- l_dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
 }
 }
 \examples{

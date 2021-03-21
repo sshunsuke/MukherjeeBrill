@@ -49,7 +49,7 @@ specified superfical velocities of gas and liquid.
 Generate data (matrix) for flow regime map. Range of the map is specified by \code{vector_vsG} and \code{vector_vsL}.
 }
 \examples{
-vs_range = glfMB:::frm_vs_range(0.1, 10, 20, TRUE)
+vs_range = glfMB:::vs_vector_MB(0.1, 10, 20, TRUE)
 frm <- generate_frm_MB(vs_range, vs_range, 0.1, 40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
 glfMB:::plot.frm_MB(frm)
 

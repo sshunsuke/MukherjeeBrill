@@ -13,5 +13,5 @@ Blasius(Re)
 Darcy friction factor
 }
 \description{
-Calculate the Darcy friction factor with assuming a smooth pipe
+Calculate the Darcy friction factor with assuming a smooth pipe.
 }

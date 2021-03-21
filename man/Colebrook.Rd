@@ -24,5 +24,5 @@ Darcy friction factor
 }
 \description{
 Calculate the Darcy friction factor with the Colebrook correlation.
-As the correlation cannot be resolved explicitly, Newton-Raphson is used.
+As the correlation cannot be resolved explicitly, Newton-Raphson method is used.
 }
