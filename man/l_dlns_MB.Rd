@@ -27,7 +27,10 @@ l_dlns_MB(vsG, vsL, D, densityG, densityL,
 \item{angle}{Pipe angle in radian (0 is horizontal flow)}
 }
 \value{
-Data frame of dimensionless numbers (\code{NLv}, \code{NGv}, \code{Nd}, \code{NL}, \code{NGvSM}, \code{NLvBS}, \code{NGvBS_up}, and \code{NLvST}) and input values
+Data frame including dimensionless numbers (\code{NLv}, \code{NGv}, \code{Nd}, \code{NL},
+\code{NGvSM}, \code{NLvBS}, \code{NGvBS_up}, and \code{NLvST}) and input values (\code{vsG},
+\code{vsL}, \code{D}, \code{densityG}, \code{densityL}, \code{viscosityG}, \code{viscosityL},
+\code{surfaceTension}, and \code{angle})
 }
 \description{
 Return the dimensionless groups proposed by Duns & Ros:
@@ -43,7 +46,6 @@ Return the dimensionless groups proposed by Duns & Ros:
 }
 }
 \examples{
-\dontrun{
 vsG <- 3.86 * 0.3048    # 3.86 ft/s
 vsL <- 3.97 * 0.3048    # 3.97 ft/s
 D   <- 6 * 0.0254       # 6 inch
@@ -52,9 +54,9 @@ densityL <- 47.61 * 16.01845    # 47.61 lbm/ft3 - (1 lbm/ft3 = 16.01845 kg/m3)
 viscosityG <- 0.016 / 1000      # 0.016 cp
 viscosityL <- 0.97  / 1000      # 0.970 cp
 surfaceTension <- 8.41 / 1000   # 8.41 dynes/cm
-angle <- pi/2                   # 90 deg
+angle <- pi/2                   # 90 deg (upward)
 
 #  NLv=11.87, NGv=11.54, NGvSM=350.8, NLvBS_up=18.40, NL=0.0118
 l_dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
-}
+
 }

@@ -23,6 +23,9 @@
 Plot a flow regime map
 }
 \examples{
-# plot(a)
-
+\dontrun{
+frm <- generate_frm_MB(vector_vsG, vector_vsL, D, densityG, densityL,
+                      viscosityG, viscosityL, surfaceTension, angle)
+plot(frm)
+}
 }

@@ -4,8 +4,9 @@
 #' with the model of Mukherjee and Brill (1985), which predicts flow regime, liquid holdup, and pressure drop.
 #'
 #' @references
-#' * Mukherjee, H., and J. P. Brill. 1985. Pressure Drop Correlations for Inclined Two-Phase Flow. Journal of Energy Resources Technology, Transactions of the ASME 107 (4)
-#' * Mukherjee, Hemanta, and James P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
+#' * Mukherjee, H., and Brill J. P. 1985. Pressure Drop Correlations for Inclined Two-Phase Flow. Journal of Energy Resources Technology, Transactions of the ASME 107 (4)
+#' * Mukherjee, H., and Brill J. P. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
+#' * Mukherjee, H., and Brill J. P. 1983. Liquid Holdup Correlations for Inclined Two-Phase Flow. JPT, Journal of Petroleum Technology 35(5):1003–8.
 #'
 #' @name glfMB
 #' @docType package
@@ -143,13 +144,15 @@ l_Darcy_friction_factor <- function(Re, roughness, D, tol=1e-8, itMax=10) {
 #' @param surfaceTension Surface tension
 #' @param angle Pipe angle in radian (0 is horizontal flow)
 #'
-#' @return Data frame of dimensionless numbers (`NLv`, `NGv`, `Nd`, `NL`, `NGvSM`, `NLvBS`, `NGvBS_up`, and `NLvST`) and input values
+#' @return Data frame including dimensionless numbers (`NLv`, `NGv`, `Nd`, `NL`,
+#'         `NGvSM`, `NLvBS`, `NGvBS_up`, and `NLvST`) and input values (`vsG`, 
+#'         `vsL`, `D`, `densityG`, `densityL`, `viscosityG`, `viscosityL`,
+#'         `surfaceTension`, and `angle`)
 #'
 #' @usage l_dlns_MB(vsG, vsL, D, densityG, densityL,
 #'           viscosityG, viscosityL, surfaceTension, angle)
 #'
 #' @examples
-#' \dontrun{
 #' vsG <- 3.86 * 0.3048    # 3.86 ft/s
 #' vsL <- 3.97 * 0.3048    # 3.97 ft/s
 #' D   <- 6 * 0.0254       # 6 inch
@@ -158,11 +161,11 @@ l_Darcy_friction_factor <- function(Re, roughness, D, tol=1e-8, itMax=10) {
 #' viscosityG <- 0.016 / 1000      # 0.016 cp
 #' viscosityL <- 0.97  / 1000      # 0.970 cp
 #' surfaceTension <- 8.41 / 1000   # 8.41 dynes/cm
-#' angle <- pi/2                   # 90 deg
+#' angle <- pi/2                   # 90 deg (upward)
 #'
 #' #  NLv=11.87, NGv=11.54, NGvSM=350.8, NLvBS_up=18.40, NL=0.0118
 #' l_dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
-#' }
+#' 
 #' @export
 #' @md
 

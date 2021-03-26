@@ -17,7 +17,7 @@ Colebrook(Re, roughness, D, tol = 1e-08, itMax = 10, warn = TRUE)
 
 \item{itMax}{Maximum number of iteration  (optional)}
 
-\item{warn}{show warnings when Re <= 4000  (optional)}
+\item{warn}{If FALSE, not show warnings when Re <= 4000  (optional)}
 }
 \value{
 Darcy friction factor

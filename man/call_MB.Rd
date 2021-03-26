@@ -25,7 +25,7 @@ call_MB(vsG, vsL, D, densityG, densityL,
 
 \item{surfaceTension}{Surface tension - N/m}
 
-\item{angle}{Pipe angle (0 is horizontal flow) - radian}
+\item{angle}{Pipe angle (a positive value means upward) - radian}
 
 \item{roughness}{Pipe roughness - m}
 
@@ -75,6 +75,6 @@ call_MB(vsG, vsL, D, densityG, densityL,
 \references{
 \itemize{
 \item Mukherjee, H., and J. P. Brill. 1985. Pressure Drop Correlations for Inclined Two-Phase Flow. Journal of Energy Resources Technology, Transactions of the ASME 107 (4)
-\item Mukherjee, Hemanta, and James P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
+\item Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
 }
 }

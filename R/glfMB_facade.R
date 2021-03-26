@@ -24,7 +24,7 @@
 #' @param viscosityG Visosity of gas - Pa-s
 #' @param viscosityL Visosity of liquid - Pa-s
 #' @param surfaceTension Surface tension - N/m
-#' @param angle Pipe angle (0 is horizontal flow) - radian
+#' @param angle Pipe angle (a positive value means upward) - radian
 #' @param roughness Pipe roughness - m
 #' @param pressure Pressure (optional) - Pa
 #'
@@ -35,7 +35,7 @@
 #'
 #' @references
 #' * Mukherjee, H., and J. P. Brill. 1985. Pressure Drop Correlations for Inclined Two-Phase Flow. Journal of Energy Resources Technology, Transactions of the ASME 107 (4)
-#' * Mukherjee, Hemanta, and James P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
+#' * Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
 #'
 #' @examples
 #' # This example is from Brill and Mukherjee (1999) "Multiphase Flow in Wells"
@@ -105,6 +105,9 @@ call_MB <- function(vsG, vsL, D, densityG, densityL,
 #' frm <- generate_frm_MB(vs_range, vs_range, 0.1, 40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
 #' glfMB:::plot.frm_MB(frm)
 #'
+#' @references
+#' Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
+#'
 #' @export
 #' @md
 generate_frm_MB <- function(vector_vsG, vector_vsL, D, densityG, densityL,
@@ -115,6 +118,7 @@ generate_frm_MB <- function(vector_vsG, vector_vsL, D, densityG, densityL,
   frm
 }
 
+# internal function
 frm0_MB <- function(vsG, vsL, D, densityG, densityL,
                     viscosityG, viscosityL, surfaceTension, angle) {
   dlns <- l_dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
@@ -136,8 +140,12 @@ frm0_MB <- function(vsG, vsL, D, densityG, densityL,
 #' @param yval 'vsL' or 'NLv' (optional)
 #' @param ... graphical parameters to plot
 #'
-#' @examples # plot(a)
-#'
+#' @examples
+#' \dontrun{
+#' frm <- generate_frm_MB(vector_vsG, vector_vsL, D, densityG, densityL,
+#'                       viscosityG, viscosityL, surfaceTension, angle)
+#' plot(frm)
+#' }
 #' @importFrom graphics plot points
 #'
 #' @rdname plot.frm_MB
@@ -187,7 +195,7 @@ Blasius <- function(Re) {
 #' @param D Pipe diameter
 #' @param tol Tolerance in Newton-Raphson method (optional)
 #' @param itMax Maximum number of iteration  (optional)
-#' @param warn show warnings when Re <= 4000  (optional)
+#' @param warn If FALSE, not show warnings when Re <= 4000  (optional)
 #'
 #' @return Darcy friction factor
 #' @export
