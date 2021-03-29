@@ -19,33 +19,6 @@ NULL
 #
 #
 
-# - - - - - - - - - - - - - - - - - - - - - - - - -
-# Constants ----
-# * pi ----
-# - - - - - - - - - - - - - - - - - - - - - - - - -
-
-g <- 9.8    # Gravitational acceleration (m/s2)
-
-
-
-# - - - - - - - - - - - - - - - - - - - - - - - - -
-# Utilities (not exported) ----
-# - - - - - - - - - - - - - - - - - - - - - - - - -
-
-circle_area = function(D) { (D/2)^2 * pi }
-
-Reynolds <- function(density, v, D, viscosity) {
-  density * v * D / viscosity
-}
-
-# Converter from radian to degree
-rad2deg = function(rad) { rad * 180 / pi }
-
-# Convertor from degree to radian
-deg2rad = function(deg) { deg * pi / 180 }
-
-
-
 
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 # Darcy friction factor ----
@@ -305,8 +278,26 @@ l_flow_regime_MB_core <- function(NGv, NLv, angle, NGvSM, NGvBS, NLvBS_up, NLvST
 #' @export
 #' @md
 l_holdup_MB <- function(DLNs, flowRegime) {
-  mapply(glfMB:::l_holdup_MB_core,
-         DLNs$angle, DLNs$NL, DLNs$NGv, DLNs$NLv, flowRegime)
+  # coefficients
+  co <- cbind(
+    c(-0.380113, 0.129875, -0.119788,  2.343227, 0.475686, 0.288657),   # Up
+    c(-1.330282, 4.808139,  4.171584, 56.262268, 0.079951, 0.504887),   # DownStratified
+    c(-0.516644, 0.789805,  0.551627, 15.519214, 0.371771, 0.393952)    # DownOther
+  )
+  
+  # 1: Up, 2: DownStratified, 3: DownOther
+  j <- ifelse((DLNs$angle >= 0), 1, ifelse((flowRegime == 1), 2, 3))
+  #cat(j)
+  t1 <- co[1,j] + (co[2,j] * sin(DLNs$angle)) + (co[3,j] * sin(DLNs$angle)^2) + (co[4,j] * DLNs$NL^2)
+  t2 <- DLNs$NGv^co[5,j] / DLNs$NLv^co[6,j]
+  exp(t1 * t2)
+  
+  
+  
+  
+  
+  #mapply(glfMB:::l_holdup_MB_core,
+  #       DLNs$angle, DLNs$NL, DLNs$NGv, DLNs$NLv, flowRegime)
 }
 
 # Core logic to calculate holdup
@@ -329,7 +320,7 @@ l_holdup_MB_core <- function(angle, NL, NGv, NLv, flowRegime) {
 
   # 1: Up, 2: DownStratified, 3: DownOther
   j <- ifelse((angle > 0), 1, ifelse((flowRegime == 1), 2, 3))
-
+#cat(j)
   t1 <- co[1,j] + (co[2,j] * sin(angle)) + (co[3,j] * sin(angle)^2) + (co[4,j] * NL^2)
   t2 <- NGv^co[5,j] / NLv^co[6,j]
   exp(t1 * t2)

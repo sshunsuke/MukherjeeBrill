@@ -74,6 +74,8 @@ call_MB <- function(vsG, vsL, D, densityG, densityL,
   hl <- l_holdup_MB(dlns, fr)
   dPdL <- l_dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
   
+  stopifnot(hl > 0 && hl < 1)
+  
   data.frame("fr" = fr, "hl" = hl, "dPdL" = as.vector(dPdL))
 }
 

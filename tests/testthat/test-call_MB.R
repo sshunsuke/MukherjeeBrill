@@ -1,8 +1,11 @@
+# Test code for call_MB()
+#
+# * call_MB()
+# * l_dlns_MB(), l_holdup_MB(), l_dPdL_MB
 
 
 
-
-test_that("call_MB: Slug flow", {
+test_that("call_MB(): Slug flow", {
   vsG <- 3.86 * 0.3048            # 3.86 ft/s
   vsL <- 3.97 * 0.3048            # 3.97 ft/s
   ID  <- 6 * 0.0254               # 6 inch
