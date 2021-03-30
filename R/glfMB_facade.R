@@ -74,11 +74,12 @@ call_MB <- function(vsG, vsL, D, densityG, densityL,
   hl <- l_holdup_MB(dlns, fr)
   dPdL <- l_dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
   
-  stopifnot(hl > 0 && hl < 1)
+  if (any(hl < 0) || any(hl > 1)) {
+    stop(sprintf("holdup was not calculated correctly (hl=%.3f). call_MB() may not support viscous liquid.", hl))
+  }
   
   data.frame("fr" = fr, "hl" = hl, "dPdL" = as.vector(dPdL))
 }
-
 
 
 #' Generate flow regime map (frm) data
@@ -212,22 +213,22 @@ Colebrook <- function(Re, roughness, D, tol=1e-8, itMax=10, warn=TRUE) {
 
 #' Generate a vector of superficial velocities (vs)
 #' 
-#' @param vs_min minimum value of superficial velocities
-#' @param vs_max maximum value of superficial velocities
+#' @param from minimum value of superficial velocities
+#' @param to maximum value of superficial velocities
 #' @param num_points number of data points of the returned vector
 #' @param log_scale a
 #'
 #' @export
-vs_vector_MB <- function(vs_min, vs_max, num_points, log_scale) {
+vs_vector_MB <- function(from, to, num_points, log_scale) {
   log_scale <- ifelse(missing(log_scale), FALSE, log_scale)
   
-  stopifnot(vs_min < vs_max)
+  stopifnot(from < to)
   
   if (log_scale == TRUE) {
-    ret <- seq(log10(vs_min), log10(vs_max), length.out = num_points)
+    ret <- seq(log10(from), log10(to), length.out = num_points)
     ret <- 10^(ret)
   } else {
-    ret <- seq(vs_min, vs_max, length.out = num_points)
+    ret <- seq(from, to, length.out = num_points)
   }
   ret
 }

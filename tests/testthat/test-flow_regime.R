@@ -13,6 +13,11 @@ surfaceTension <- td$Kerosene_surfaceTension(temperature)
 coefficient <- (densityL / glfMB:::g / surfaceTension)^(0.25)
 
 
+test_that("vs_vector_MB()", {
+  expect_equal(vs_vector_MB(1, 5, 5), 1:5)
+  expect_equal(vs_vector_MB(0.1, 100, 4, TRUE), c(0.1, 1, 10, 100))
+})
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 # Kerosene, 70 deg downflow ----

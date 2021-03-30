@@ -44,7 +44,7 @@ Colebrook_core <- function(Re, roughness, D, tol, itMax, warn) {
   while (abs(d) >= tol) {
     it <- it + 1
     if (it > itMax) {
-      stop("Calculation did not converge.")
+      stop(sprintf("Calculation did not converge, tol=%f, itMax=%d.", tol, itMax))
     }
     
     d <- fun(fD_n) / dFun(fD_n)
@@ -291,41 +291,7 @@ l_holdup_MB <- function(DLNs, flowRegime) {
   t1 <- co[1,j] + (co[2,j] * sin(DLNs$angle)) + (co[3,j] * sin(DLNs$angle)^2) + (co[4,j] * DLNs$NL^2)
   t2 <- DLNs$NGv^co[5,j] / DLNs$NLv^co[6,j]
   exp(t1 * t2)
-  
-  
-  
-  
-  
-  #mapply(glfMB:::l_holdup_MB_core,
-  #       DLNs$angle, DLNs$NL, DLNs$NGv, DLNs$NLv, flowRegime)
 }
-
-# Core logic to calculate holdup
-#
-# Internal function, called by `l_holdup_MB()`.
-#
-# @param angle Pipe angle (radian)
-# @param NL a
-# @param NGv b
-# @param NLv c
-# @param flowRegime d
-# @return holdup
-l_holdup_MB_core <- function(angle, NL, NGv, NLv, flowRegime) {
-  # coefficients
-  co <- cbind(
-    c(-0.380113, 0.129875, -0.119788,  2.343227, 0.475686, 0.288657),   # Up
-    c(-1.330282, 4.808139,  4.171584, 56.262268, 0.079951, 0.504887),   # DownStratified
-    c(-0.516644, 0.789805,  0.551627, 15.519214, 0.371771, 0.393952)    # DownOther
-  )
-
-  # 1: Up, 2: DownStratified, 3: DownOther
-  j <- ifelse((angle > 0), 1, ifelse((flowRegime == 1), 2, 3))
-#cat(j)
-  t1 <- co[1,j] + (co[2,j] * sin(angle)) + (co[3,j] * sin(angle)^2) + (co[4,j] * NL^2)
-  t2 <- NGv^co[5,j] / NLv^co[6,j]
-  exp(t1 * t2)
-}
-
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - -

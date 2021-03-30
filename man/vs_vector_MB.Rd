@@ -4,12 +4,12 @@
 \alias{vs_vector_MB}
 \title{Generate a vector of superficial velocities (vs)}
 \usage{
-vs_vector_MB(vs_min, vs_max, num_points, log_scale)
+vs_vector_MB(from, to, num_points, log_scale)
 }
 \arguments{
-\item{vs_min}{minimum value of superficial velocities}
+\item{from}{minimum value of superficial velocities}
 
-\item{vs_max}{maximum value of superficial velocities}
+\item{to}{maximum value of superficial velocities}
 
 \item{num_points}{number of data points of the returned vector}
 
