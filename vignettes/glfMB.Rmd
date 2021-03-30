@@ -1,0 +1,66 @@
+---
+title: "Example code with glfMB"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{glfMB}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Setup
+
+SI unit is used for all properties. 
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(glfMB)
+
+# Basic settings
+temperature <- 10 + 273.15   # 10 degC
+pressure <- 3 * 100000       # 3 bar
+ID <- 0.05                   # 5 cm
+angle <- -pi/6               # -30 deg (downward)
+
+# Properties of fluids for examples
+td <- testdata_MB()
+densityG <- td$Air_density(temperature, pressure)
+densityL <- td$Kerosene_density(temperature)
+viscosityG <- td$Air_viscosity(temperature, pressure)
+viscosityL <- td$Kerosene_viscosity(temperature)
+surfaceTension <- td$Kerosene_surfaceTension(temperature)
+```
+
+----
+
+# Basic
+
+## Create flow regime maps
+
+```{r}
+vsG <- 1:10
+vsL <- 1:10
+frm <- generate_frm_MB(vsG, vsL, ID, densityG, densityL,
+                       viscosityG, viscosityL, surfaceTension, angle)
+plot(frm)
+
+# If you want to check flow regime in wide ranges of vsG and vsL, 
+# vs_vector_MB() may be useful.
+#   vs_vector_MB(from, to, num_points, log_scale)
+VsG_wider <- vs_vector_MB(0.1, 100, 10, TRUE)
+VsL_wider <- vs_vector_MB(0.1, 100, 10, TRUE)
+frm_wider <- generate_frm_MB(VsG_wider, VsL_wider, ID, densityG, densityL,
+                             viscosityG, viscosityL, surfaceTension, angle)
+plot(frm_wider, log="xy")
+```
+
+
+
+
+
+

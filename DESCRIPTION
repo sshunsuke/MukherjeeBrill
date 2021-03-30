@@ -1,7 +1,7 @@
 Package: glfMB
 Type: Package
 Title: A package for calculation of gas-liquid two-phase flow in a circular pipe
-Version: 0.3.1
+Version: 0.3.2
 Author: Shunsuke
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: Mukherjee & Brill model for gas-liquid two-phase flow in a circular pipe
@@ -16,5 +16,8 @@ Depends:
 Imports:
     stats
 Suggests: 
+    rmarkdown,
+    knitr,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+VignetteBuilder: knitr
