@@ -234,60 +234,87 @@ vs_vector_MB <- function(from, to, num_points, log_scale) {
 }
 
 
-#' Get a list of functions for test (and example)
+# testdata_MB$ ----
+
+#' List of functions and constants for test (and example)
 #' 
-#' This function returns a list of functions for fluid properties (see also Value).
-#' 
-#' @return a list of functions for fluid properties. SI unit is used in the functions. 
-#' * Kerosene_surfaceTension(temperature) - K
-#' * Kerosene_density(temperature) - K
-#' * Kerosene_viscosity(temperature) - K
+#' A list containing functions and constants for fluid properties used in tests (see also Value).
+#' SI unit is used.
+#' * Mair: Molar mass of air - kg/mol
+#' * Sutherland_vis0_air: Viscosity of air at 273 K - Pa-s
+#' * Sutherland_T0_air - K
+#' * Sutherland_C_air - K
+#' * ideal_gas_density(temperature, pressure, M) - kg/m3 (K, Pa)
+#' * Sutherland_viscosityG(temperature, viscosity0, t0, const) - Pa-s (K, Pa-s, K, K)
+#' * Kerosene_surfaceTension(temperature): K
+#' * Kerosene_density(temperature) - kg/m3 (K, Pa)
+#' * Kerosene_viscosity(temperature): K
 #' * Lubricating_surfaceTension(temperature) - K
-#' * Lubricating_density(temperature) - K
+#' * Lubricating_density(temperature) - kg/m3 (K, Pa)
 #' * Lubricating_viscosity(temperature) - K
-#' * Air_density(temperature, pressure) - K, Pa
-#' * Air_viscosity(temperature, pressure) - K, Pa
 #' 
-#' @examples td <- testdata_MB()
-#' td$Kerosene_viscosity(283.15)     # Kerosene Viscosity at 10 degC
-#' td$Air_density(293.15, 5*100000)  # Air density at 20 degC and 5 bar
+#' @name testdata_MB
+#' @docType data
+#' 
+#' @examples
+#' testdata_MB$Kerosene_viscosity(283.15)     # Kerosene Viscosity at 10 degC
+#'
+#' density_air <- function(temperature, pressure) {
+#'   testdata_MB$ideal_gas_density(temperature, pressure, testdata_MB$Mair)
+#' } 
+#' density_air(293.15, 5*100000)  # Air density at 20 degC and 5 bar
 #'
 #' @export
 #' @md
-testdata_MB <- function() {
+testdata_MB <- list(
   
-  list(
-    # Kerosene (Mukherjee & Brill, 1985)
-    Kerosene_surfaceTension = function(temperature) {
-      (27.6 - 0.09 * (temperature-273.15)) / 1000           # N/m
-    },
-    Kerosene_density = function(temperature) {
-      832.34 - 0.8333 * (temperature-273.15)                # kg/m3
-    },
-    Kerosene_viscosity = function(temperature) {
-      1e-03 * exp(1.0664 - 0.0207 * (temperature-273.15))   # Pa
-    },
+  # Molar mass of air (kg/mol)
+  Mair = 28.96 / 1000,  
+  
+  # Constants for Sutherland's formula
+  Sutherland_vis0_air = 1.71E-5,    # Pa-s
+  Sutherland_T0_air = 273,          # K
+  Sutherland_C_air = 110.4,         # K
+  
+  # Density of ideal gas
+  ideal_gas_density = function(temperature, pressure, M) {
+    pressure * M / (glfMB:::R * temperature)
+  },
     
-    # Lubricating Oil (Mukherjee & Brill, 1985)
-    Lubricating_surfaceTension = function(temperature) {
-      (36.6094 - 0.117 * (temperature-273.15)) / 1000       # N/m
-    },
-    Lubricating_density = function(temperature) {
-      861.22 - 0.7585 * (temperature-273.15)                # kg/m3
-    },
-    Lubricating_viscosity = function(temperature) {
-      1e-03 * exp(3.99 - 0.0412 * (temperature-273.15))     # Pa
-    },
+  # Sutherland's formula
+  Sutherland_viscosityG = function(temperature, viscosity0, t0, const) {
+    viscosity0 * (temperature / t0)^(3/2) * (t0 + const) / (temperature + const)
+  },
     
-    # Air (regarded as ideal gas)
-    Air_density = function(temperature, pressure) {
-      M <- 28.96 / 1000  # Molar mass of air (kg/mol)
-      R <- 8.314         # Gas constant
-      pressure * M / (R * temperature)
-    },
-    Air_viscosity = function(temperature, pressure) { 1.81 * 10^(-5)}
-  )
-}
+  # Kerosene (Mukherjee & Brill, 1985)
+  Kerosene_surfaceTension = function(temperature) {
+    (27.6 - 0.09 * (temperature-273.15)) / 1000           # N/m
+  },
+  Kerosene_density = function(temperature) {
+    832.34 - 0.8333 * (temperature-273.15)                # kg/m3
+  },
+  Kerosene_viscosity = function(temperature) {
+    1e-03 * exp(1.0664 - 0.0207 * (temperature-273.15))   # Pa
+  },
+    
+    
+    
+    
+    
+    
+  # Lubricating Oil (Mukherjee & Brill, 1985)
+  Lubricating_surfaceTension = function(temperature) {
+    (36.6094 - 0.117 * (temperature-273.15)) / 1000       # N/m
+  },
+  Lubricating_density = function(temperature) {
+    861.22 - 0.7585 * (temperature-273.15)                # kg/m3
+  },
+  Lubricating_viscosity = function(temperature) {
+    1e-03 * exp(3.99 - 0.0412 * (temperature-273.15))     # Pa
+  }
+    
+)
+
 
 
 

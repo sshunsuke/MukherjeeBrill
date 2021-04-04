@@ -3,7 +3,10 @@
 # * pi ----
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 
-g <- 9.8    # Gravitational acceleration (m/s2)
+g <- 9.8              # Gravitational acceleration (m/s2)
+R <- 8.314            # Gas constant
+
+
 
 
 

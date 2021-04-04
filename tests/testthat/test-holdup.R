@@ -4,13 +4,21 @@ temperature <- 10 + 273.15   # 10 degC
 pressure <- 8.6 * 100000     # 8.6 bar
 ID <- 0.0381                 # 3.81 cm
 
-td <- testdata_MB()
+viscosity_air <- function(temperature) {
+  testdata_MB$Sutherland_viscosityG(temperature, testdata_MB$Sutherland_vis0_air,
+                                    testdata_MB$Sutherland_T0_air, testdata_MB$Sutherland_C_air)
+}
 
-densityG <- td$Air_density(temperature, pressure)
-densityL <- td$Kerosene_density(temperature)
-viscosityG <- td$Air_viscosity(temperature, pressure)
-viscosityL <- td$Kerosene_viscosity(temperature)
-surfaceTension <- td$Kerosene_surfaceTension(temperature)
+density_air <- function(temperature, pressure) {
+  testdata_MB$ideal_gas_density(temperature, pressure, testdata_MB$Mair)
+}
+
+
+densityG <- density_air(temperature, pressure)
+densityL <- testdata_MB$Kerosene_density(temperature)
+viscosityG <- viscosity_air(temperature)
+viscosityL <- testdata_MB$Kerosene_viscosity(temperature)
+surfaceTension <- testdata_MB$Kerosene_surfaceTension(temperature)
 
 
 check_range <- function(val, calc, tol) {
