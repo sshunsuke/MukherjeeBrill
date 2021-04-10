@@ -18,4 +18,19 @@ test_that("Colebrook()", {
   expect_equal(round(Colebrook(Re, 0.005, ID), 4), c(0.0758, 0.0736, 0.0716, 0.0716), tolerance=0.005)
 })
 
+test_that("laminar()", {
+  # laminar flow
+  Re_lam <- c(500, 1000, 1500, 2000)
+  expect_equal(glfMB:::laminar(Re_lam), 64/Re_lam)
+})
 
+
+
+test_that("l_Darcy_friction_factor()", {
+  ID <- 0.1
+  Re_lam <- 500
+  
+  # laminar flow
+  expect_equal(glfMB:::l_Darcy_friction_factor(Re_lam, 0.0001, ID), 64/Re_lam)
+  
+})

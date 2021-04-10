@@ -83,7 +83,7 @@ l_Darcy_friction_factor <- function(Re, roughness, D, tol=1e-8, itMax=10) {
   if (Re >= 4000) {
     ret <- glfMB:::Colebrook(Re, roughness, D)
   } else if (Re <= 2000) {
-    ret <- glfMB:::laminar(Re, roughness, D)
+    ret <- glfMB:::laminar(Re)
   } else {
     ret <- glfMB:::transition(Re, roughness, D)
   }
@@ -336,7 +336,7 @@ ffRatio <- (function(){
 
 
 l_dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosityL, angle,
-                         flowRegime, HL, roughness, pressure, debug) {
+                           flowRegime, HL, roughness, pressure, debug) {
   g <- glfMB:::g
 
   if (flowRegime == 1) {
@@ -371,16 +371,17 @@ l_dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosit
     fDG <- glfMB:::l_Darcy_friction_factor(ReG, roughness, D)
     fDL <- glfMB:::l_Darcy_friction_factor(ReL, roughness, D)
 
-    shearStressG <- fDG * densityG * vG^2 / (2*g)    # 4.153
-    shearStressL <- fDL * densityL * vL^2 / (2*g)    # 4.152
+    # Wall shear stress = (D/4) * dPdL
+    shearStressG <- fDG * densityG * vG^2 / 8      # 4.153
+    shearStressL <- fDL * densityL * vL^2 / 8      # 4.152
 
     if (debug == TRUE) {
       cat(sprintf("delta: %.2f, dhG: %.2f, dhL: %.2f", delta, dhG, dhL))
-      cat(sprintf("PG: %.2f, PL: %.2f, ReG: %.1f, ReL: %.1f"), PG, PL, ReG, ReL)
+      cat(sprintf("PG: %.2f, PL: %.2f, ReG: %.1f, ReL: %.1f", PG, PL, ReG, ReL))
     }
 
     # dPdL (4.144)
-    dPdL <- - (shearStressL * PL + shearStressG * PG) - (viscosityL * AL + viscosityG * AG) * g * sin(angle)
+    dPdL <- (shearStressL * PL + shearStressG * PG) + (densityL * AL + densityG * AG) * g * sin(angle)
   } else {
     vmix <- vsG + vsL
     HLnoslip <- vsL / vmix
