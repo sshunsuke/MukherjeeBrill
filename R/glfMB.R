@@ -80,6 +80,10 @@ transition <- function(Re, roughness, D, tol=1e-8, itMax=10, warn=TRUE) {
 #' @return Darcy friction factor
 #' @export
 l_Darcy_friction_factor <- function(Re, roughness, D, tol=1e-8, itMax=10) {
+  mapply(glfMB:::l_Darcy_friction_factor_core, Re, roughness, D, tol, itMax)
+}
+
+l_Darcy_friction_factor_core <- function(Re, roughness, D, tol, itMax) {
   if (Re >= 4000) {
     ret <- glfMB:::Colebrook(Re, roughness, D)
   } else if (Re <= 2000) {
@@ -89,6 +93,7 @@ l_Darcy_friction_factor <- function(Re, roughness, D, tol=1e-8, itMax=10) {
   }
   ret
 }
+
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -344,15 +349,17 @@ l_dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosit
 
     # delta: angle related to liquid level (shown in Fig 4.20)
     fun <- function(delta) { 1/(2*pi) * (delta - sin(delta)) - HL }  # (4.147)
-    f <- stats::uniroot(fun, c(0,2*pi))
+    f <- stats::uniroot(fun, c(0,2*pi), tol = 1e-10)
     delta <- f$root
 
     # Flow area of each phase
-    AL <- glfMB:::circle_area(D) * HL         # (4.147)
-    AG <- glfMB:::circle_area(D) * (1 - HL)
+    A  <- glfMB:::circle_area(D)
+    AL <- A * HL         # (4.147)
+    AG <- A * (1 - HL)
 
     # 4.146 for hL/d
     #   4.150 and 4.151
+    # Dh = 4A / P
     dhG <- D * (2*pi - (delta - sin(delta))) / (2*pi - delta + 2 * sin(delta/2))    # (4.150)
     dhL <- D * (delta - sin(delta)) / (delta + 2 * sin(delta / 2))                  # (4.151)
 
@@ -368,20 +375,20 @@ l_dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosit
     ReG <- glfMB:::Reynolds(densityG, vG, dhG, viscosityG)   # (4.155)
     ReL <- glfMB:::Reynolds(densityL, vL, dhL, viscosityL)   # (4.154)
 
-    fDG <- glfMB:::l_Darcy_friction_factor(ReG, roughness, D)
-    fDL <- glfMB:::l_Darcy_friction_factor(ReL, roughness, D)
+    fDG <- glfMB:::l_Darcy_friction_factor_core(ReG, roughness, D)
+    fDL <- glfMB:::l_Darcy_friction_factor_core(ReL, roughness, D)
 
     # Wall shear stress = (D/4) * dPdL
     shearStressG <- fDG * densityG * vG^2 / 8      # 4.153
     shearStressL <- fDL * densityL * vL^2 / 8      # 4.152
 
-    if (debug == TRUE) {
-      cat(sprintf("delta: %.2f, dhG: %.2f, dhL: %.2f", delta, dhG, dhL))
-      cat(sprintf("PG: %.2f, PL: %.2f, ReG: %.1f, ReL: %.1f", PG, PL, ReG, ReL))
-    }
+    #if (debug == TRUE) {
+    #  cat(sprintf("delta: %.2f, dhG: %.2f, dhL: %.2f", delta, dhG, dhL))
+    #  cat(sprintf("PG: %.2f, PL: %.2f, ReG: %.1f, ReL: %.1f", PG, PL, ReG, ReL))
+    #}
 
     # dPdL (4.144)
-    dPdL <- (shearStressL * PL + shearStressG * PG) + (densityL * AL + densityG * AG) * g * sin(angle)
+    dPdL <- (shearStressL * PL + shearStressG * PG) / A + (densityL * HL + densityG * (1-HL)) * g * sin(angle)
   } else {
     vmix <- vsG + vsL
     HLnoslip <- vsL / vmix
@@ -401,7 +408,7 @@ l_dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosit
 
     if (flowRegime == 2) {
       # Annular
-      fn <- glfMB:::l_Darcy_friction_factor(ReN, roughness, D)    # no-slip friction factor
+      fn <- glfMB:::l_Darcy_friction_factor_core(ReN, roughness, D)    # no-slip friction factor
       HR <- HLnoslip / HL                    # (4.140)
       fR <- glfMB:::ffRatio(HR)              # friction factor ratio
       fD <- fn * fR                          # (4.141)
@@ -409,7 +416,7 @@ l_dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosit
       dPdL <- (fD * densityMixS * vmix^2 / (2 * D) + densityMixS * g * sin(angle)) / (1 - Ek)  # (4.139)
     } else if (flowRegime == 3 | flowRegime == 4) {
       # Slug or Bubble
-      fD <- glfMB:::l_Darcy_friction_factor(ReN, roughness, D)
+      fD <- glfMB:::l_Darcy_friction_factor_core(ReN, roughness, D)
       dPdL <- (fD * densityMixS * vmix^2 / (2 * D) + densityMixS * g * sin(angle)) / (1 - Ek)  # (4.136)
     } else {
       # error!
