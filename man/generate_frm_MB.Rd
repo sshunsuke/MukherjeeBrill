@@ -36,22 +36,23 @@ generate_frm_MB(
 \item{angle}{Pipe angle (0 is horizontal flow) - radian}
 }
 \value{
-A matrix (class="frm_MB") including the information of flow regime at
+A matrix (class="frm_MB") including the information of flow regime (columns) at
 specified superfical velocities of gas and liquid.
 \itemize{
 \item \code{vsG}: Superficial velocity of gas
 \item \code{vsL}: Superficial velocity of liquid
 \item \code{fr}: Flow regime (1: Stratified, 2: Annular, 3: Slug, and 4: Bubbly)
-\item \code{NGv}, \code{NLv}, \code{NL}, \code{NGvSM}, \code{NGvBS}, \code{NLvBS_up}, \code{NLvST}: Properties used in model
+\item \code{NGv}, \code{NLv}, \code{NL}, \code{NGvSM}, \code{NGvBS}, \code{NLvBS_up}, \code{NLvST}: Properties used in the prediction of flow regime
 }
 }
 \description{
 Generate data (matrix) for flow regime map. Range of the map is specified by \code{vector_vsG} and \code{vector_vsL}.
 }
 \examples{
-vs_range = glfMB:::vs_vector_MB(0.1, 10, 20, TRUE)
-frm <- generate_frm_MB(vs_range, vs_range, 0.1, 40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
-glfMB:::plot.frm_MB(frm)
+vs_range = glfMB::vs_vector_MB(0.1, 10, 20, TRUE)
+frm <- generate_frm_MB(vs_range, vs_range, 0.1,
+                       40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
+plot(frm)    # glfMB:::plot.frm_MB(frm)
 
 }
 \references{

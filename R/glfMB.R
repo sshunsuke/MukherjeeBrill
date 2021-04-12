@@ -303,7 +303,7 @@ l_holdup_MB <- function(DLNs, flowRegime) {
 # dPdL    ----
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#' Low-level function to calculate pressure drop (dP/L)
+#' Low-level function to calculate pressure drop
 #'
 #' @param DLNs dimensionless numbers calculated by `l_dlns_MB()`
 #' @param flowRegime flow regime estimated by `l_flow_regime_MB()`
@@ -312,7 +312,11 @@ l_holdup_MB <- function(DLNs, flowRegime) {
 #' @param pressure Pressure (optional)
 #' @param debug If TRUE, print parameters (usually set to FALSE)
 #'
-#' @return pressure drop (Pa/m)
+#' @return A vector (or matrix) including following properties (or columns):
+#' * \['dPdL'\]: pressure drop (Pa/m)
+#' * \['dPdL_H'\]: pressure drop due to hydrostatic (Pa/m)
+#' * \['dPdL_F'\]: pressure drop due to friction (Pa/m)
+#' * \['dPdL_A'\]: pressure drop due to acceleration  (Pa/m)
 #'
 #' @export
 #' @md
@@ -388,7 +392,10 @@ l_dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosit
     #}
 
     # dPdL (4.144)
-    dPdL <- (shearStressL * PL + shearStressG * PG) / A + (densityL * HL + densityG * (1-HL)) * g * sin(angle)
+    dPdL_H <- (densityL * HL + densityG * (1-HL)) * g * sin(angle)
+    dPdL_F <- (shearStressL * PL + shearStressG * PG) / A
+    dPdL_A <- 0
+    dPdL   <- dPdL_H + dPdL_F
   } else {
     vmix <- vsG + vsL
     HLnoslip <- vsL / vmix
@@ -412,34 +419,39 @@ l_dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosit
       HR <- HLnoslip / HL                    # (4.140)
       fR <- glfMB:::ffRatio(HR)              # friction factor ratio
       fD <- fn * fR                          # (4.141)
-
-      dPdL <- (fD * densityMixS * vmix^2 / (2 * D) + densityMixS * g * sin(angle)) / (1 - Ek)  # (4.139)
+      
+      dPdL_F <- fD * densityMixN * vmix^2 / (2 * D)
     } else if (flowRegime == 3 | flowRegime == 4) {
       # Slug or Bubble
       fD <- glfMB:::l_Darcy_friction_factor_core(ReN, roughness, D)
-      dPdL <- (fD * densityMixS * vmix^2 / (2 * D) + densityMixS * g * sin(angle)) / (1 - Ek)  # (4.136)
+      dPdL_F <- fD * densityMixS * vmix^2 / (2 * D)
     } else {
       # error!
       stop("Undefined flow regime.")
     }
+    
+    dPdL_H <- densityMixS * g * sin(angle)
+    dPdL   <- (dPdL_F + dPdL_H) / (1 - Ek)       # (4.136), (4.139)
+    dPdL_A <- dPdL - dPdL_H - dPdL_F
   }
 
-  ret <- dPdL
+  ret <- c('dPdL'=dPdL, 'dPdL_H'=dPdL_H, 'dPdL_F'=dPdL_F, 'dPdL_A'=dPdL_A)
 
   if (debug == TRUE) {
     if (flowRegime == 1) {
       # Stratified
-      ret <- c('dPdL'=ret, 'delta'=delta, 'dhG'=dhG, 'dhL'=dhL, 'PG'=PG, 'PL'=PL,
+      ret <- c(ret, 'delta'=delta, 'dhG'=dhG, 'dhL'=dhL, 'PG'=PG, 'PL'=PL,
                'ReG'=ReG, 'ReL'=ReL, 'fDG'=fDG, 'fDL'=fDL,
                'shearStressG'=shearStressG, 'shearStressL'=shearStressL)
     } else if (flowRegime == 2) {
       # Annular
-      ret <- c('dPdL'=ret, 'densityMixS'=densityMixS, 'densityMixN'=densityMixN,
+      ret <- c(ret, 'densityMixS'=densityMixS, 'densityMixN'=densityMixN,
                'viscosityMixS'=viscosityMixS, 'viscosityMixN'=viscosityMixN,
                'ReN'=ReN, 'Ek'=Ek, 'fn'=fn, 'HR'=HR, 'fR'=fR, 'fD'=fD)
     } else {
       # Slug or Bubble
-      ret <- c('dPdL'=ret, 'densityMixS'=densityMixS, 'densityMixN'=densityMixN,
+      ret <- c(ret,
+               'densityMixS'=densityMixS, 'densityMixN'=densityMixN,
                'viscosityMixS'=viscosityMixS, 'viscosityMixN'=viscosityMixN,
                'ReN'=ReN, 'Ek'=Ek, 'fD'=fD)
     }

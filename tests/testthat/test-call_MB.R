@@ -24,6 +24,8 @@ test_that("call_MB(): Slug flow", {
   expect_equal(ret$fr, 3)
   expect_equal(ret$hl, 0.560, tolerance = 0.0005)  # diff <= 0.005%
   expect_equal(ret$dPdL, 4727, tolerance = 0.005)  # diff <= 0.05%
+  expect_equal(ret$dPdL_H, 29.249*0.006944*6894.76 / 0.3048, tolerance = 0.005)
+  expect_equal(ret$dPdL_F, 0.864*0.006944*6894.76 / 0.3048, tolerance = 0.005)
 })
 
 
@@ -58,6 +60,9 @@ test_that("l_dlns_MB(), l_holdup_MB(), l_dPdL_MB: Slug flow", {
   expect_equal(hl, 0.560, tolerance=0.001)            # diff <= 0.1%
   
   expect_equal(dPdL[1,'dPdL'], c(dPdL=4727), tolerance = 0.005)  # diff <= 0.05%
+  expect_equal(dPdL[1,'dPdL_H'], c('dPdL_H'=29.249*0.006944*6894.76 / 0.3048), tolerance = 0.005)
+  expect_equal(dPdL[1,'dPdL_F'], c('dPdL_F'=0.864*0.006944*6894.76 / 0.3048), tolerance = 0.005)
+  
   expect_equal(dPdL[1,'ReN'], c(ReN=315000), tolerance = 0.001)  # diff <= 0.01%
   expect_equal(dPdL[1,'fD'], c(fD=0.0155), tolerance = 0.0005)   # diff <= 0.005%
   expect_equal(dPdL[1,'densityMixS'], c(densityMixS=densityG*(1-hl)+densityL*hl))

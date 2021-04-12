@@ -31,3 +31,5 @@ deg2rad = function(deg) { deg * pi / 180 }
 ft2m <- function(ft) { ft * 0.3048 }
 m2ft <- function(m) { m / 0.3048 }
 
+psi2Pa <- function(psi) { psi * 6894.76}
+

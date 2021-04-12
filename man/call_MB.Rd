@@ -37,23 +37,27 @@ Data frame including following data:
 \item \code{fr}: Flow regime (1: Stratified, 2: Annular, 3: Slug, and 4: Bubbly)
 \item \code{hl}: Holdup
 \item \code{dPdL}: Pressure drop per unit length - Pa/m
+\item \code{dPdL_H}: Pressure drop per unit length due to hydrostatic - Pa/m
+\item \code{dPdL_F}: Pressure drop per unit length due to friction - Pa/m
+\item \code{dPdL_A}: Pressure drop per unit length due to acceleration - Pa/m
 }
 }
 \description{
-Call the core functions of Mukherjee & Brill model: \code{l_dlns_MB()}, \code{l_flow_regime_MB()},
+Call core functions of Mukherjee & Brill model: \code{l_dlns_MB()}, \code{l_flow_regime_MB()},
 \code{l_holdup_MB()}, and \code{l_dPdL_MB()} to calculate flow regime, holdup, and pressure drop.
 The last argument (\code{pressure}) is for consideration of accelaration, which you can ignore.
 }
 \note{
-You can execute the calculation step by step without this function if want. Below is an example.\preformatted{dlns <- l_dlns_MB(vsG, vsL, D, densityG, densityL,
+You can execute the calculation step by step by calling low-level functions if you need. Below is an example.\preformatted{dlns <- l_dlns_MB(vsG, vsL, D, densityG, densityL,
                   viscosityG, viscosityL, surfaceTension, angle)
-fr   <- l_flow_regime_MB(dlns)
+fr <- l_flow_regime_MB(dlns)
 hl <- l_holdup_MB(dlns, fr)
 dPdL <- l_dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
 }
 }
 \examples{
-# This example is from Brill and Mukherjee (1999) "Multiphase Flow in Wells"
+# This example is from Brill and Mukherjee (1999)
+# "Multiphase Flow in Wells"
 vsG <- 3.86 * 0.3048    # 3.86 ft/s
 vsL <- 3.97 * 0.3048    # 3.97 ft/s
 D   <- 6 * 0.0254       # 6 inch

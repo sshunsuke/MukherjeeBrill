@@ -8,7 +8,7 @@
 
 #' Calculate flow regime, holdup, and pressure drop with the model of Mukherjee and Brill (1985)
 #'
-#' Call the core functions of Mukherjee & Brill model: `l_dlns_MB()`, `l_flow_regime_MB()`,
+#' Call core functions of Mukherjee & Brill model: `l_dlns_MB()`, `l_flow_regime_MB()`,
 #' `l_holdup_MB()`, and `l_dPdL_MB()` to calculate flow regime, holdup, and pressure drop.
 #' The last argument (`pressure`) is for consideration of accelaration, which you can ignore.
 #'
@@ -32,13 +32,17 @@
 #' * `fr`: Flow regime (1: Stratified, 2: Annular, 3: Slug, and 4: Bubbly)
 #' * `hl`: Holdup
 #' * `dPdL`: Pressure drop per unit length - Pa/m
+#' * `dPdL_H`: Pressure drop per unit length due to hydrostatic - Pa/m
+#' * `dPdL_F`: Pressure drop per unit length due to friction - Pa/m
+#' * `dPdL_A`: Pressure drop per unit length due to acceleration - Pa/m
 #'
 #' @references
 #' * Mukherjee, H., and J. P. Brill. 1985. Pressure Drop Correlations for Inclined Two-Phase Flow. Journal of Energy Resources Technology, Transactions of the ASME 107 (4)
 #' * Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
 #'
 #' @examples
-#' # This example is from Brill and Mukherjee (1999) "Multiphase Flow in Wells"
+#' # This example is from Brill and Mukherjee (1999)
+#' # "Multiphase Flow in Wells"
 #' vsG <- 3.86 * 0.3048    # 3.86 ft/s
 #' vsL <- 3.97 * 0.3048    # 3.97 ft/s
 #' D   <- 6 * 0.0254       # 6 inch
@@ -56,11 +60,11 @@
 #'         viscosityG, viscosityL, surfaceTension,
 #'         angle, roughness, pressure)
 #'
-#' @note You can execute the calculation step by step without this function if want. Below is an example.
+#' @note You can execute the calculation step by step by calling low-level functions if you need. Below is an example.
 #' ```
 #' dlns <- l_dlns_MB(vsG, vsL, D, densityG, densityL,
 #'                   viscosityG, viscosityL, surfaceTension, angle)
-#' fr   <- l_flow_regime_MB(dlns)
+#' fr <- l_flow_regime_MB(dlns)
 #' hl <- l_holdup_MB(dlns, fr)
 #' dPdL <- l_dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
 #' ```
@@ -78,7 +82,10 @@ call_MB <- function(vsG, vsL, D, densityG, densityL,
     stop(sprintf("holdup was not calculated correctly (hl=%.3f). call_MB() may not support viscous liquid.", hl))
   }
   
-  data.frame("fr" = fr, "hl" = hl, "dPdL" = as.vector(dPdL))
+  data.frame("fr" = fr, "hl" = hl, "dPdL" = as.vector(dPdL[,'dPdL']),
+             "dPdL_H" = as.vector(dPdL[,'dPdL_H']),
+             "dPdL_F" = as.vector(dPdL[,'dPdL_F']),
+             "dPdL_A" = as.vector(dPdL[,'dPdL_A']))
 }
 
 
@@ -96,17 +103,18 @@ call_MB <- function(vsG, vsL, D, densityG, densityL,
 #' @param surfaceTension Surface tension - N/m
 #' @param angle Pipe angle (0 is horizontal flow) - radian
 #'
-#' @return A matrix (class="frm_MB") including the information of flow regime at
+#' @return A matrix (class="frm_MB") including the information of flow regime (columns) at
 #' specified superfical velocities of gas and liquid.
 #' * `vsG`: Superficial velocity of gas
 #' * `vsL`: Superficial velocity of liquid
 #' * `fr`: Flow regime (1: Stratified, 2: Annular, 3: Slug, and 4: Bubbly)
-#' * `NGv`, `NLv`, `NL`, `NGvSM`, `NGvBS`, `NLvBS_up`, `NLvST`: Properties used in model
+#' * `NGv`, `NLv`, `NL`, `NGvSM`, `NGvBS`, `NLvBS_up`, `NLvST`: Properties used in the prediction of flow regime
 #'
 #' @examples
-#' vs_range = glfMB:::vs_vector_MB(0.1, 10, 20, TRUE)
-#' frm <- generate_frm_MB(vs_range, vs_range, 0.1, 40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
-#' glfMB:::plot.frm_MB(frm)
+#' vs_range = glfMB::vs_vector_MB(0.1, 10, 20, TRUE)
+#' frm <- generate_frm_MB(vs_range, vs_range, 0.1,
+#'                        40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
+#' plot(frm)    # glfMB:::plot.frm_MB(frm)
 #'
 #' @references
 #' Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)

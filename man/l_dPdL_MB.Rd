@@ -2,7 +2,7 @@
 % Please edit documentation in R/glfMB.R
 \name{l_dPdL_MB}
 \alias{l_dPdL_MB}
-\title{Low-level function to calculate pressure drop (dP/L)}
+\title{Low-level function to calculate pressure drop}
 \usage{
 l_dPdL_MB(DLNs, flowRegime, HL, roughness, pressure, debug = FALSE)
 }
@@ -20,8 +20,14 @@ l_dPdL_MB(DLNs, flowRegime, HL, roughness, pressure, debug = FALSE)
 \item{debug}{If TRUE, print parameters (usually set to FALSE)}
 }
 \value{
-pressure drop (Pa/m)
+A vector (or matrix) including following properties (or columns):
+\itemize{
+\item ['dPdL']: pressure drop (Pa/m)
+\item ['dPdL_H']: pressure drop due to hydrostatic (Pa/m)
+\item ['dPdL_F']: pressure drop due to friction (Pa/m)
+\item ['dPdL_A']: pressure drop due to acceleration  (Pa/m)
+}
 }
 \description{
-Low-level function to calculate pressure drop (dP/L)
+Low-level function to calculate pressure drop
 }
