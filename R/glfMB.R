@@ -114,7 +114,7 @@ l_Darcy_friction_factor_core <- function(Re, roughness, D, tol, itMax) {
 #'
 #' @param vsG Superficial velocity of gas
 #' @param vsL Superficial velocity of liquid
-#' @param D Pipe diameter
+#' @param ID Pipe internal diameter
 #' @param densityG Density of gas
 #' @param densityL Density of liquid
 #' @param viscosityG Visosity of gas
@@ -127,32 +127,34 @@ l_Darcy_friction_factor_core <- function(Re, roughness, D, tol, itMax) {
 #'         `vsL`, `D`, `densityG`, `densityL`, `viscosityG`, `viscosityL`,
 #'         `surfaceTension`, and `angle`)
 #'
-#' @usage l_dlns_MB(vsG, vsL, D, densityG, densityL,
+#' @usage l_dlns_MB(vsG, vsL, ID, densityG, densityL,
 #'           viscosityG, viscosityL, surfaceTension, angle)
 #'
 #' @examples
-#' vsG <- 3.86 * 0.3048    # 3.86 ft/s
-#' vsL <- 3.97 * 0.3048    # 3.97 ft/s
-#' D   <- 6 * 0.0254       # 6 inch
-#' densityG <- 5.88 * 16.01845     # 5.88 lbm/ft3  - (1 lbm/ft3 = 16.01845 kg/m3)
-#' densityL <- 47.61 * 16.01845    # 47.61 lbm/ft3 - (1 lbm/ft3 = 16.01845 kg/m3)
-#' viscosityG <- 0.016 / 1000      # 0.016 cp
-#' viscosityL <- 0.97  / 1000      # 0.970 cp
-#' surfaceTension <- 8.41 / 1000   # 8.41 dynes/cm
-#' angle <- pi/2                   # 90 deg (upward)
+#' # This example is from Brill and Mukherjee (1999)
+#' # "Multiphase Flow in Wells" p.21, p.46 (Example 3.2 and 4.8)
+#' vsG <- 3.86 * 0.3048           # 3.86 ft/s
+#' vsL <- 3.97 * 0.3048           # 3.97 ft/s
+#' ID <- 6 * 0.0254               # 6 inch
+#' densityG <- 5.88 * 16.01845    # 5.88 lbm/ft3  - (1 lbm/ft3 = 16.01845 kg/m3)
+#' densityL <- 47.61 * 16.01845   # 47.61 lbm/ft3 - (1 lbm/ft3 = 16.01845 kg/m3)
+#' viscosityG <- 0.016 / 1000     # 0.016 cp
+#' viscosityL <- 0.97  / 1000     # 0.970 cp
+#' surfaceTension <- 8.41 / 1000  # 8.41 dynes/cm
+#' angle <- pi/2                  # 90 deg (upward)
 #'
 #' #  NLv=11.87, NGv=11.54, NGvSM=350.8, NLvBS_up=18.40, NL=0.0118
-#' l_dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
+#' l_dlns_MB(vsG, vsL, ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
 #' 
 #' @export
 #' @md
 
-l_dlns_MB <- function(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle) {
+l_dlns_MB <- function(vsG, vsL, ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle) {
   g <- glfMB:::g
 
   NLv <- vsL * (densityL / g / surfaceTension)^(0.25)
   NGv <- vsG * (densityL / g / surfaceTension)^(0.25)
-  Nd <- D * sqrt(densityL * g / surfaceTension)
+  Nd <- ID * sqrt(densityL * g / surfaceTension)
   NL <- viscosityL * (g / densityL / surfaceTension^3)^(0.25)
 
   # Gas velocity number for Slug/(Annular Mist) transition (4.130)
@@ -184,7 +186,7 @@ l_dlns_MB <- function(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, s
     # Input values (these are used in the calculations of holdup and dPdL).
     vsG = vsG,
     vsL = vsL,
-    D = D,
+    ID = ID,
     densityG = densityG,
     densityL = densityL,
     viscosityG = viscosityG,
@@ -326,7 +328,7 @@ l_dPdL_MB <- function(DLNs, flowRegime, HL, roughness, pressure, debug=FALSE) {
   }
 
   t(mapply(glfMB:::l_dPdL_core_MB,
-           DLNs$D, DLNs$vsG, DLNs$vsL, DLNs$densityG, DLNs$densityL,
+           DLNs$ID, DLNs$vsG, DLNs$vsL, DLNs$densityG, DLNs$densityL,
            DLNs$viscosityG, DLNs$viscosityL, DLNs$angle,
            flowRegime, HL, roughness, pressure, debug))
 }

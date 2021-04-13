@@ -2,7 +2,7 @@
 % Please edit documentation in R/glfMB_facade.R
 \name{vs_vector_MB}
 \alias{vs_vector_MB}
-\title{Generate a vector of superficial velocities (vs)}
+\title{Generate a vector of superficial velocities}
 \usage{
 vs_vector_MB(from, to, num_points, log_scale)
 }
@@ -13,8 +13,18 @@ vs_vector_MB(from, to, num_points, log_scale)
 
 \item{num_points}{number of data points of the returned vector}
 
-\item{log_scale}{a}
+\item{log_scale}{If TRUE, log scale is used for intervals of data points (optional)}
+}
+\value{
+a vector of superficial velocities
 }
 \description{
-Generate a vector of superficial velocities (vs)
+Generate a vector of superficial velocities
+}
+\examples{
+vs_vector_MB(1, 100, 5)
+# 1  25.75  50.50  75.25  100
+vs_vector_MB(1, 100, 5, TRUE)
+# 1  3.162278  10  31.622777  100
+
 }

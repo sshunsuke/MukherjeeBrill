@@ -18,7 +18,7 @@
 #'
 #' @param vsG Superficial velocity of gas - m/s
 #' @param vsL Superficial velocity of liquid - m/s
-#' @param D Pipe diameter - m
+#' @param ID Pipe internal diameter - m
 #' @param densityG Density of gas - kg/m3
 #' @param densityL Density of liquid - kg/m3
 #' @param viscosityG Visosity of gas - Pa-s
@@ -39,30 +39,31 @@
 #' @references
 #' * Mukherjee, H., and J. P. Brill. 1985. Pressure Drop Correlations for Inclined Two-Phase Flow. Journal of Energy Resources Technology, Transactions of the ASME 107 (4)
 #' * Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
+#' * J. P. Brill., and Mukherjee, H. 1999. Multiphase Flow in Wells. Society of Petroleum Engineers.
 #'
 #' @examples
 #' # This example is from Brill and Mukherjee (1999)
-#' # "Multiphase Flow in Wells"
-#' vsG <- 3.86 * 0.3048    # 3.86 ft/s
-#' vsL <- 3.97 * 0.3048    # 3.97 ft/s
-#' D   <- 6 * 0.0254       # 6 inch
-#' densityG <- 5.88 * 16.01845     # 5.88 lbm/ft3  - (1 lbm/ft3 = 16.01845 kg/m3)
-#' densityL <- 47.61 * 16.01845    # 47.61 lbm/ft3 - (1 lbm/ft3 = 16.01845 kg/m3)
-#' viscosityG <- 0.016 / 1000      # 0.016 cp
-#' viscosityL <- 0.97  / 1000      # 0.970 cp
-#' surfaceTension <- 8.41 / 1000   # 8.41 dynes/cm
-#' angle <- pi/2                   # 90 deg
-#' roughness <- 0.00006 * 0.3048   # 0.00006 ft
-#' pressure <- 1700 * 6894.76      # 1700 psia (Example 3.2)
+#' # "Multiphase Flow in Wells" p.21, p.46 (Example 3.2 and 4.8)
+#' vsG <- 3.86 * 0.3048           # 3.86 ft/s
+#' vsL <- 3.97 * 0.3048           # 3.97 ft/s
+#' ID <- 6 * 0.0254               # 6 inch
+#' densityG <- 5.88 * 16.01845    # 5.88 lbm/ft3
+#' densityL <- 47.61 * 16.01845   # 47.61 lbm/ft3
+#' viscosityG <- 0.016 / 1000     # 0.016 cp
+#' viscosityL <- 0.97  / 1000     # 0.970 cp
+#' surfaceTension <- 8.41 / 1000  # 8.41 dynes/cm
+#' angle <- pi/2                  # 90 deg
+#' roughness <- 0.00006 * 0.3048  # 0.00006 ft
+#' pressure <- 1700 * 6894.76     # 1700 psia
 #'
 #' # Results should be 3 (slug), 0.560, and about 4727 Pa/m (= 0.209 psi/ft)
-#' call_MB(vsG, vsL, D, densityG, densityL,
+#' call_MB(vsG, vsL, ID, densityG, densityL,
 #'         viscosityG, viscosityL, surfaceTension,
 #'         angle, roughness, pressure)
 #'
 #' @note You can execute the calculation step by step by calling low-level functions if you need. Below is an example.
 #' ```
-#' dlns <- l_dlns_MB(vsG, vsL, D, densityG, densityL,
+#' dlns <- l_dlns_MB(vsG, vsL, ID, densityG, densityL,
 #'                   viscosityG, viscosityL, surfaceTension, angle)
 #' fr <- l_flow_regime_MB(dlns)
 #' hl <- l_holdup_MB(dlns, fr)
@@ -71,9 +72,9 @@
 #'
 #' @export
 #' @md
-call_MB <- function(vsG, vsL, D, densityG, densityL,
+call_MB <- function(vsG, vsL, ID, densityG, densityL,
                     viscosityG, viscosityL, surfaceTension, angle, roughness, pressure) {
-  dlns <- l_dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
+  dlns <- l_dlns_MB(vsG, vsL, ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
   fr   <- l_flow_regime_MB(dlns)
   hl <- l_holdup_MB(dlns, fr)
   dPdL <- l_dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
@@ -89,9 +90,9 @@ call_MB <- function(vsG, vsL, D, densityG, densityL,
 }
 
 
-#' Generate flow regime map (frm) data
+#' Generate data for flow regime map (frm_MB) 
 #'
-#' Generate data (matrix) for flow regime map. Range of the map is specified by `vector_vsG` and `vector_vsL`.
+#' Generate a matrix (class="frm_MB") for a flow regime map. Range of the map is specified by `vector_vsG` and `vector_vsL`.
 #'
 #' @param vector_vsG Vector of Superficial velocity of gas - m/s
 #' @param vector_vsL Vector of superficial velocity of liquid - m/s
@@ -108,7 +109,7 @@ call_MB <- function(vsG, vsL, D, densityG, densityL,
 #' * `vsG`: Superficial velocity of gas
 #' * `vsL`: Superficial velocity of liquid
 #' * `fr`: Flow regime (1: Stratified, 2: Annular, 3: Slug, and 4: Bubbly)
-#' * `NGv`, `NLv`, `NL`, `NGvSM`, `NGvBS`, `NLvBS_up`, `NLvST`: Properties used in the prediction of flow regime
+#' * `NGv`, `NLv`, `NL`, `NGvSM`, `NGvBS`, `NLvBS_up`, `NLvST`: Internal properties used in the prediction of flow regime
 #'
 #' @examples
 #' vs_range = glfMB::vs_vector_MB(0.1, 10, 20, TRUE)
@@ -143,6 +144,8 @@ frm0_MB <- function(vsG, vsL, D, densityG, densityL,
 
 
 #' Plot a flow regime map
+#' 
+#' This function is automatically called by plot() when the class is `frm_MB`.
 #'
 #' @param x Flow regime map data created by `generate_frm_MB()`
 #' @param xlab label x (optional)
@@ -152,15 +155,19 @@ frm0_MB <- function(vsG, vsL, D, densityG, densityL,
 #' @param ... graphical parameters to plot
 #'
 #' @examples
-#' \dontrun{
-#' frm <- generate_frm_MB(vector_vsG, vector_vsL, D, densityG, densityL,
-#'                       viscosityG, viscosityL, surfaceTension, angle)
-#' plot(frm)
-#' }
+#' vs_range = glfMB::vs_vector_MB(0.1, 10, 20, TRUE)
+#' frm <- generate_frm_MB(vs_range, vs_range, 0.1,
+#'                        40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
+#' plot(frm)    # glfMB:::plot.frm_MB(frm)
+#' 
+#' @references
+#' Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
+#' 
 #' @importFrom graphics plot points
 #'
 #' @rdname plot.frm_MB
 #' @export
+#' @md
 plot.frm_MB <- function(x, xlab, ylab, xval='vsG', yval='vsL', ...) {
   xlab <- ifelse(missing(xlab), xval, xlab)
   ylab <- ifelse(missing(ylab), yval, ylab)
@@ -219,12 +226,20 @@ Colebrook <- function(Re, roughness, D, tol=1e-8, itMax=10, warn=TRUE) {
 # Utilities ----
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#' Generate a vector of superficial velocities (vs)
+#' Generate a vector of superficial velocities
 #' 
 #' @param from minimum value of superficial velocities
 #' @param to maximum value of superficial velocities
 #' @param num_points number of data points of the returned vector
-#' @param log_scale a
+#' @param log_scale If TRUE, log scale is used for intervals of data points (optional)
+#'
+#' @return a vector of superficial velocities
+#' 
+#' @examples
+#' vs_vector_MB(1, 100, 5)
+#' # 1  25.75  50.50  75.25  100
+#' vs_vector_MB(1, 100, 5, TRUE)
+#' # 1  3.162278  10  31.622777  100
 #'
 #' @export
 vs_vector_MB <- function(from, to, num_points, log_scale) {

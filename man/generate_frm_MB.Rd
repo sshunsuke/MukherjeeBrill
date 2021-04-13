@@ -2,7 +2,7 @@
 % Please edit documentation in R/glfMB_facade.R
 \name{generate_frm_MB}
 \alias{generate_frm_MB}
-\title{Generate flow regime map (frm) data}
+\title{Generate data for flow regime map (frm_MB)}
 \usage{
 generate_frm_MB(
   vector_vsG,
@@ -42,11 +42,11 @@ specified superfical velocities of gas and liquid.
 \item \code{vsG}: Superficial velocity of gas
 \item \code{vsL}: Superficial velocity of liquid
 \item \code{fr}: Flow regime (1: Stratified, 2: Annular, 3: Slug, and 4: Bubbly)
-\item \code{NGv}, \code{NLv}, \code{NL}, \code{NGvSM}, \code{NGvBS}, \code{NLvBS_up}, \code{NLvST}: Properties used in the prediction of flow regime
+\item \code{NGv}, \code{NLv}, \code{NL}, \code{NGvSM}, \code{NGvBS}, \code{NLvBS_up}, \code{NLvST}: Internal properties used in the prediction of flow regime
 }
 }
 \description{
-Generate data (matrix) for flow regime map. Range of the map is specified by \code{vector_vsG} and \code{vector_vsL}.
+Generate a matrix (class="frm_MB") for a flow regime map. Range of the map is specified by \code{vector_vsG} and \code{vector_vsL}.
 }
 \examples{
 vs_range = glfMB::vs_vector_MB(0.1, 10, 20, TRUE)

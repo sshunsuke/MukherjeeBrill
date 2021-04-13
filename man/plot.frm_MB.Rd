@@ -7,7 +7,7 @@
 \method{plot}{frm_MB}(x, xlab, ylab, xval = "vsG", yval = "vsL", ...)
 }
 \arguments{
-\item{x}{Flow regime map data created by `generate_frm_MB()`}
+\item{x}{Flow regime map data created by \code{generate_frm_MB()}}
 
 \item{xlab}{label x (optional)}
 
@@ -20,12 +20,15 @@
 \item{...}{graphical parameters to plot}
 }
 \description{
-Plot a flow regime map
+This function is automatically called by plot() when the class is \code{frm_MB}.
 }
 \examples{
-\dontrun{
-frm <- generate_frm_MB(vector_vsG, vector_vsL, D, densityG, densityL,
-                      viscosityG, viscosityL, surfaceTension, angle)
-plot(frm)
+vs_range = glfMB::vs_vector_MB(0.1, 10, 20, TRUE)
+frm <- generate_frm_MB(vs_range, vs_range, 0.1,
+                       40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
+plot(frm)    # glfMB:::plot.frm_MB(frm)
+
 }
+\references{
+Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
 }

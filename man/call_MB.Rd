@@ -13,7 +13,7 @@ call_MB(vsG, vsL, D, densityG, densityL,
 
 \item{vsL}{Superficial velocity of liquid - m/s}
 
-\item{D}{Pipe diameter - m}
+\item{ID}{Pipe internal diameter - m}
 
 \item{densityG}{Density of gas - kg/m3}
 
@@ -48,7 +48,7 @@ Call core functions of Mukherjee & Brill model: \code{l_dlns_MB()}, \code{l_flow
 The last argument (\code{pressure}) is for consideration of accelaration, which you can ignore.
 }
 \note{
-You can execute the calculation step by step by calling low-level functions if you need. Below is an example.\preformatted{dlns <- l_dlns_MB(vsG, vsL, D, densityG, densityL,
+You can execute the calculation step by step by calling low-level functions if you need. Below is an example.\preformatted{dlns <- l_dlns_MB(vsG, vsL, ID, densityG, densityL,
                   viscosityG, viscosityL, surfaceTension, angle)
 fr <- l_flow_regime_MB(dlns)
 hl <- l_holdup_MB(dlns, fr)
@@ -57,21 +57,21 @@ dPdL <- l_dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
 }
 \examples{
 # This example is from Brill and Mukherjee (1999)
-# "Multiphase Flow in Wells"
-vsG <- 3.86 * 0.3048    # 3.86 ft/s
-vsL <- 3.97 * 0.3048    # 3.97 ft/s
-D   <- 6 * 0.0254       # 6 inch
-densityG <- 5.88 * 16.01845     # 5.88 lbm/ft3  - (1 lbm/ft3 = 16.01845 kg/m3)
-densityL <- 47.61 * 16.01845    # 47.61 lbm/ft3 - (1 lbm/ft3 = 16.01845 kg/m3)
-viscosityG <- 0.016 / 1000      # 0.016 cp
-viscosityL <- 0.97  / 1000      # 0.970 cp
-surfaceTension <- 8.41 / 1000   # 8.41 dynes/cm
-angle <- pi/2                   # 90 deg
-roughness <- 0.00006 * 0.3048   # 0.00006 ft
-pressure <- 1700 * 6894.76      # 1700 psia (Example 3.2)
+# "Multiphase Flow in Wells" p.21, p.46 (Example 3.2 and 4.8)
+vsG <- 3.86 * 0.3048           # 3.86 ft/s
+vsL <- 3.97 * 0.3048           # 3.97 ft/s
+ID <- 6 * 0.0254               # 6 inch
+densityG <- 5.88 * 16.01845    # 5.88 lbm/ft3
+densityL <- 47.61 * 16.01845   # 47.61 lbm/ft3
+viscosityG <- 0.016 / 1000     # 0.016 cp
+viscosityL <- 0.97  / 1000     # 0.970 cp
+surfaceTension <- 8.41 / 1000  # 8.41 dynes/cm
+angle <- pi/2                  # 90 deg
+roughness <- 0.00006 * 0.3048  # 0.00006 ft
+pressure <- 1700 * 6894.76     # 1700 psia
 
 # Results should be 3 (slug), 0.560, and about 4727 Pa/m (= 0.209 psi/ft)
-call_MB(vsG, vsL, D, densityG, densityL,
+call_MB(vsG, vsL, ID, densityG, densityL,
         viscosityG, viscosityL, surfaceTension,
         angle, roughness, pressure)
 
@@ -80,5 +80,6 @@ call_MB(vsG, vsL, D, densityG, densityL,
 \itemize{
 \item Mukherjee, H., and J. P. Brill. 1985. Pressure Drop Correlations for Inclined Two-Phase Flow. Journal of Energy Resources Technology, Transactions of the ASME 107 (4)
 \item Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
+\item J. P. Brill., and Mukherjee, H. 1999. Multiphase Flow in Wells. Society of Petroleum Engineers.
 }
 }

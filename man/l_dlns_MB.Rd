@@ -4,7 +4,7 @@
 \alias{l_dlns_MB}
 \title{Low-level function to calculate dimensionless numbers}
 \usage{
-l_dlns_MB(vsG, vsL, D, densityG, densityL,
+l_dlns_MB(vsG, vsL, ID, densityG, densityL,
           viscosityG, viscosityL, surfaceTension, angle)
 }
 \arguments{
@@ -12,7 +12,7 @@ l_dlns_MB(vsG, vsL, D, densityG, densityL,
 
 \item{vsL}{Superficial velocity of liquid}
 
-\item{D}{Pipe diameter}
+\item{ID}{Pipe internal diameter}
 
 \item{densityG}{Density of gas}
 
@@ -46,17 +46,19 @@ Return the dimensionless groups proposed by Duns & Ros:
 }
 }
 \examples{
-vsG <- 3.86 * 0.3048    # 3.86 ft/s
-vsL <- 3.97 * 0.3048    # 3.97 ft/s
-D   <- 6 * 0.0254       # 6 inch
-densityG <- 5.88 * 16.01845     # 5.88 lbm/ft3  - (1 lbm/ft3 = 16.01845 kg/m3)
-densityL <- 47.61 * 16.01845    # 47.61 lbm/ft3 - (1 lbm/ft3 = 16.01845 kg/m3)
-viscosityG <- 0.016 / 1000      # 0.016 cp
-viscosityL <- 0.97  / 1000      # 0.970 cp
-surfaceTension <- 8.41 / 1000   # 8.41 dynes/cm
-angle <- pi/2                   # 90 deg (upward)
+# This example is from Brill and Mukherjee (1999)
+# "Multiphase Flow in Wells" p.21, p.46 (Example 3.2 and 4.8)
+vsG <- 3.86 * 0.3048           # 3.86 ft/s
+vsL <- 3.97 * 0.3048           # 3.97 ft/s
+ID <- 6 * 0.0254               # 6 inch
+densityG <- 5.88 * 16.01845    # 5.88 lbm/ft3  - (1 lbm/ft3 = 16.01845 kg/m3)
+densityL <- 47.61 * 16.01845   # 47.61 lbm/ft3 - (1 lbm/ft3 = 16.01845 kg/m3)
+viscosityG <- 0.016 / 1000     # 0.016 cp
+viscosityL <- 0.97  / 1000     # 0.970 cp
+surfaceTension <- 8.41 / 1000  # 8.41 dynes/cm
+angle <- pi/2                  # 90 deg (upward)
 
 #  NLv=11.87, NGv=11.54, NGvSM=350.8, NLvBS_up=18.40, NL=0.0118
-l_dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
+l_dlns_MB(vsG, vsL, ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
 
 }
