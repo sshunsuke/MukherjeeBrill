@@ -6,6 +6,7 @@ densityL <- 1000
 viscosityG <- 10^(-5)
 viscosityL <- 10^(-3)
 roughness <- 0.0001
+pressure <- 10 * 1000 * 1000    # 10 MPa
 
 
 test_that("l_dPdL_core_MB(): Stratified flow", {
@@ -13,7 +14,6 @@ test_that("l_dPdL_core_MB(): Stratified flow", {
   vsG <- 1
   vsL <- 1
   fr <- 1
-  pressure <- 100 * 1000    # 100 kPa
   
   # stratified (holdup = 0.5, angle = 0)
   holdup <- 0.5
@@ -94,9 +94,8 @@ test_that("l_dPdL_core_MB(): Annular flow", {
   vsG <- 3
   vsL <- 1
   fr <- 2
-  pressure <- 10 * 1000 * 1000    # 10 MPa
   
-  # stratified (holdup = 0.5, angle = 0)
+  # annular (holdup = 0.5, angle = 0)
   holdup <- 0.5
   ret_an <- glfMB:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL, 0,
                                    fr, holdup, roughness, pressure, TRUE)
@@ -115,12 +114,58 @@ test_that("l_dPdL_core_MB(): Annular flow", {
   expect_equal(ret_an['fD'], c('fD' = Colebrook(exp_ReN, roughness, ID) * 1.3))
   expect_equal(ret_an['Ek'], c('Ek' = exp_Ek))
   
-  expect_equal(as.numeric(ret_an['dPdL_F']),
-               as.numeric(ret_an['fD'] * ret_an['densityMixN'] * (vsL+vsG)^2 / 2 / ID))
-  expect_equal(as.numeric(ret_an['dPdL']), as.numeric(ret_an['dPdL_F'] / (1 - exp_Ek)))
-  expect_equal(as.numeric(ret_an['dPdL_A']), as.numeric(ret_an['dPdL_F'] * exp_Ek / (1-exp_Ek)))
+  exp_dPdL_F <- ret_an['fD'] * ret_an['densityMixN'] * (vsL+vsG)^2 / 2 / ID
+  names(exp_dPdL_F) <- NULL
+  
+  expect_equal(ret_an['dPdL_F'], c('dPdL_F' = exp_dPdL_F))
+  expect_equal(ret_an['dPdL'], c('dPdL' = exp_dPdL_F / (1 - exp_Ek)))
+  expect_equal(ret_an['dPdL_A'], c('dPdL_A' = exp_dPdL_F * exp_Ek / (1-exp_Ek)))
   expect_equal(as.numeric(ret_an['dPdL_H']), 0)
   
   
+  # annular (holdup = 0.5, angle = -30 deg)
+  ret_an2 <- glfMB:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL,  -pi/6,
+                                    fr, holdup, roughness, pressure, TRUE)
+  expect_equal(ret_an2['HR'], c('HR'=0.5))    # 0.25 / 0.5 = 0.5
+  expect_equal(ret_an2['fR'], c('fR'=1.3))
+  expect_equal(ret_an2['densityMixN'], c('densityMixN'=densityG*0.75+densityL*0.25))
+  expect_equal(ret_an2['viscosityMixN'], c('viscosityMixN'=viscosityG*0.75+viscosityL*0.25))
+  expect_equal(ret_an2['ReN'], c('ReN'=exp_ReN))
+  expect_equal(ret_an2['fn'], c('fn' = Colebrook(exp_ReN, roughness, ID)))
+  expect_equal(ret_an2['fD'], c('fD' = Colebrook(exp_ReN, roughness, ID) * 1.3))
+  expect_equal(ret_an2['Ek'], c('Ek' = exp_Ek))
+  
+  exp_dPdL_H <- sin(-pi/6) * (densityG + densityL)/2 * glfMB:::g
+  
+  expect_equal(ret_an2['dPdL_F'], c('dPdL_F' = exp_dPdL_F))
+  expect_equal(ret_an2['dPdL_H'], c('dPdL_H' = exp_dPdL_H))
+  expect_equal(ret_an2['dPdL_A'], c('dPdL_A' = (exp_dPdL_F + exp_dPdL_H) * exp_Ek / (1-exp_Ek)))
+  expect_equal(ret_an2['dPdL'], c('dPdL' = (exp_dPdL_F + exp_dPdL_H) / (1-exp_Ek)))
 })
+
+
+test_that("l_dPdL_core_MB(): Bubble flow", {
+  # Dummy data
+  vsG <- 1
+  vsL <- 3
+  fr <- 4
+  
+  # Bubble (holdup = 0.5, angle = 0)
+  holdup <- 0.5
+  ret_b <- glfMB:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL, 0,
+                                  fr, holdup, roughness, pressure, TRUE)
+  exp_ReN <- as.numeric(ID * ret_b['densityMixN'] * (vsG+vsL) / ret_b['viscosityMixN'])
+  exp_densityMixS <- densityG*0.5+densityL*0.5
+  exp_Ek <- exp_densityMixS * (vsG+vsL) * vsG / pressure
+  
+  expect_equal(ret_b['densityMixN'], c('densityMixN'=densityG*0.25+densityL*0.75))
+  expect_equal(ret_b['viscosityMixN'], c('viscosityMixN'=viscosityG*0.25+viscosityL*0.75))
+  expect_equal(ret_b['ReN'], c('ReN'=exp_ReN))
+  expect_equal(ret_b['fD'], c('fD' = Colebrook(exp_ReN, roughness, ID)))
+  expect_equal(ret_b['Ek'], c('Ek' = exp_Ek))
+  
+  
+  
+})
+
 

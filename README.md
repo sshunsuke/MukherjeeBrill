@@ -13,24 +13,41 @@ This R package provides functions to calculate flow regime, liquid holdup, and p
 
 ## Installing 
 
-will be written later.
+```
+# install.packages("remotes")
+remotes::install_github("sshunsuke/glfMB")
+```
 
 ## Examples
+
+Prediction of flow regime, holdup, and pressure drop. 
 
 ```
 library(glfMB)
 
-vsG <- 3.86 * 0.3048    # 3.86 ft/s
-vsL <- 3.97 * 0.3048    # 3.97 ft/s
-D   <- 6 * 0.0254       # 6 inch
-densityG <- 5.88 * 16.01845     # 5.88 lbm/ft3  - (1 lbm/ft3 = 16.01845 kg/m3)
-densityL <- 47.61 * 16.01845    # 47.61 lbm/ft3 - (1 lbm/ft3 = 16.01845 kg/m3)
-viscosityG <- 0.016 / 1000      # 0.016 cp
-viscosityL <- 0.97  / 1000      # 0.970 cp
+# Flow conditions
+vsG <- 5               # m/s   - superficial velocity of gas
+vsL <- 1               # m/s   - superficial velocity of liquid
+ID <- 0.1              # m     - pipe inner diameter
+densityG <- 5          # kg/m3 - density of gas
+densityL <- 1000       # kg/m3 - density of liquid 
+viscosityG <- 10^(-5)  # Pa-s  - viscosity of gas
+viscosityL <- 10^(-3)  # Pa-s  - viscosity of liquid
 surfaceTension <- 8.41 / 1000   # 8.41 dynes/cm
-angle <- pi/2                   # 90 deg (upward)
+angle <- pi/2          # 90 deg (upward)
+roughness <- 0.0001      # m
 
-# NLv=11.87, NGv=11.54, NGvSM=350.8, NLvBS_up=18.40, NL=0.0118
-l_dlns_MB(vsG, vsL, D, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
+# Predict flow regime, holdup, and pressure drop. 
+call_MB(vsG, vsL, ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle, roughness)
+#   fr        hl     dPdL   dPdL_H   dPdL_F dPdL_A
+# 1  3 0.2911177 3955.877 2887.688 1068.189      0
 ```
 
+Create a flow regime map. 
+
+```
+vs_range = glfMB::vs_vector_MB(0.1, 10, 20, TRUE)
+frm <- generate_frm_MB(vs_range, vs_range, 0.1,
+                       40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
+plot(frm)
+```

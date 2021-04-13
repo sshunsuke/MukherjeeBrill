@@ -12,7 +12,7 @@
 #' `l_holdup_MB()`, and `l_dPdL_MB()` to calculate flow regime, holdup, and pressure drop.
 #' The last argument (`pressure`) is for consideration of accelaration, which you can ignore.
 #'
-#' @usage call_MB(vsG, vsL, D, densityG, densityL,
+#' @usage call_MB(vsG, vsL, ID, densityG, densityL,
 #'         viscosityG, viscosityL, surfaceTension,
 #'         angle, roughness, pressure)
 #'
@@ -319,7 +319,6 @@ testdata_MB <- list(
   Kerosene_viscosity = function(temperature) {
     1e-03 * exp(1.0664 - 0.0207 * (temperature-273.15))   # Pa
   },
-    
     
     
     

@@ -4,7 +4,7 @@
 \alias{call_MB}
 \title{Calculate flow regime, holdup, and pressure drop with the model of Mukherjee and Brill (1985)}
 \usage{
-call_MB(vsG, vsL, D, densityG, densityL,
+call_MB(vsG, vsL, ID, densityG, densityL,
         viscosityG, viscosityL, surfaceTension,
         angle, roughness, pressure)
 }
