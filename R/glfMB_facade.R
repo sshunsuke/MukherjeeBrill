@@ -292,7 +292,10 @@ vs_vector_MB <- function(from, to, num_points, log_scale) {
 testdata_MB <- list(
   
   # Molar mass of air (kg/mol)
-  Mair = 28.96 / 1000,  
+  Mair = 28.96 / 1000,
+  
+  # Molar mass of water (kg/mol)
+  Mwater = 18.02 / 1000,
   
   # Constants for Sutherland's formula
   Sutherland_vis0_air = 1.71E-5,    # Pa-s

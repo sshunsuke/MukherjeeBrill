@@ -21,7 +21,7 @@ remotes::install_github("sshunsuke/glfMB")
 
 Prediction of flow regime, holdup, and pressure drop. 
 
-```
+```r
 library(glfMB)
 
 # Flow conditions (SI unit is used for all properties)
@@ -54,10 +54,10 @@ frm <- generate_frm_MB(vector_vsG, vector_vsL, ID, densityG, densityL,
 plot(frm)
 ```
 
-You can fine more examples here. 
+You can fine more examples [here](EXAMPLES.md). 
 
 
-# License 
+## License 
 
 
 

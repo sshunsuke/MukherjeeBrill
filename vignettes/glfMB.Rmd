@@ -86,6 +86,86 @@ vector_vsG2
 
 # Advanced
 
+## Very simple flow simulation
+
+Air and water two-phase flow in an inclined pipe. 
+
+```{r sfs}
+# Functions for density and viscosity of air
+density_air <- function(temperature, pressure) {
+  testdata_MB$ideal_gas_density(temperature, pressure, testdata_MB$Mair)
+}
+viscosity_air <- function(temperature) {
+  testdata_MB$Sutherland_viscosityG(temperature,
+                                    testdata_MB$Sutherland_vis0_air,
+                                    testdata_MB$Sutherland_T0_air,
+                                    testdata_MB$Sutherland_C_air)
+}
+
+# Properties of water
+density_water <- 1000          # kg/m3
+viscosity_water <- 0.001       # Pa-s
+surfaceTension_water <- 0.072  # N/m
+
+temperature <- 20 + 273.15     # 20 degC
+inlet_pressure <- 20 * 100000  # 20 bar
+ID <- 0.1                      # 10 cm
+angle <- pi/6                  # 30 deg (upward)
+roughness <- 0.0001            # m  - Pipe roughness
+
+pipe_length <- 1000             # m
+num_section <- 20
+
+massflowrate_air <- 1        # kg/s
+massflowrate_water <- 2        # kg/s
+
+```
+
+```{r}
+section_length <- pipe_length / num_section
+area <- (ID/2)^2 * pi
+
+# Prepare an empty data frame for result
+NAs <- rep(NA, num_section)
+df <- data.frame(L=seq(section_length, pipe_length, by=section_length),
+                 pressure=NAs, fr=NAs, hl=NAs, dPdL=NAs,
+                 dPdL_H=NAs, dPdL_F=NAs, dPdL_A=NAs,
+                 vsG=NAs, vsL=NAs)
+
+pressure <- inlet_pressure
+
+for (i in 1:num_section) {
+  densityG <- density_air(temperature, pressure)
+  densityL <- density_water
+  viscosityG <- viscosity_air(temperature)
+  viscosityL <- viscosity_water
+  surfaceTension <- surfaceTension_water
+  vsG <- massflowrate_air / densityG / area
+  vsL <- massflowrate_water / densityL / area
+  
+  ret <- call_MB(vsG, vsL, ID, densityG, densityL,
+                 viscosityG, viscosityL, surfaceTension,
+                 angle, roughness, pressure)
+  pressure <- pressure - (ret$dPdL * section_length)
+  
+  df$pressure[i] <- pressure
+  df$fr[i] <- ret$fr
+  df$hl[i] <- ret$hl
+  df$dPdL[i] <- ret$dPdL
+  df$dPdL_H[i] <- ret$dPdL_H
+  df$dPdL_F[i] <- ret$dPdL_F
+  df$dPdL_A[i] <- ret$dPdL_A
+  df$vsG[i] <- vsG
+  df$vsL[i] <- vsL
+}
+
+df
+```
+
+
+
+----
+
 
 ```{r setup}
 library(glfMB)
