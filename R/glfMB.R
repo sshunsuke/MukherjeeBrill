@@ -409,12 +409,6 @@ l_dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosit
 
     ReN <- glfMB:::Reynolds(densityMixN, vmix, D, viscosityMixN)
 
-    if (is.na(pressure) == TRUE) {
-      Ek <- 0
-    } else {
-      Ek <- densityMixS * vmix * vsG / pressure    # (4.53)  (4.137)
-    }
-
     if (flowRegime == 2) {
       # Annular
       fn <- glfMB:::l_Darcy_friction_factor_core(ReN, roughness, D)    # no-slip friction factor
@@ -433,8 +427,16 @@ l_dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosit
     }
     
     dPdL_H <- densityMixS * g * sin(angle)
-    dPdL   <- (dPdL_F + dPdL_H) / (1 - Ek)       # (4.136), (4.139)
-    dPdL_A <- dPdL - dPdL_H - dPdL_F
+    
+    if (is.na(pressure) == TRUE) {
+      Ek <- 0
+      dPdL <- dPdL_F + dPdL_H
+      dPdL_A <- 0
+    } else {
+      Ek <- densityMixS * vmix * vsG / pressure    # (4.53)  (4.137)
+      dPdL   <- (dPdL_F + dPdL_H) / (1 - Ek)       # (4.136), (4.139)
+      dPdL_A <- dPdL - dPdL_H - dPdL_F
+    }
   }
 
   ret <- c('dPdL'=dPdL, 'dPdL_H'=dPdL_H, 'dPdL_F'=dPdL_F, 'dPdL_A'=dPdL_A)

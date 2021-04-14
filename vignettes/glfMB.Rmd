@@ -9,14 +9,83 @@ vignette: >
 
 # Setup
 
-SI unit is used for all properties. 
-
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 ```
+
+```{r }
+library(glfMB)
+```
+
+----
+
+# Basic
+
+## Estimate flow regime, holdup, and pressure drop
+
+```{r basic0}
+# Flow conditions (SI unit is used for all properties)
+vsG <- 5                 # m/s   - superficial velocity of gas
+vsL <- 1                 # m/s   - superficial velocity of liquid
+ID <- 0.1                # m     - pipe inner diameter
+densityG <- 1            # kg/m3 - density of gas
+densityL <- 1000         # kg/m3 - density of liquid 
+viscosityG <- 10^(-5)    # Pa-s  - viscosity of gas
+viscosityL <- 10^(-3)    # Pa-s  - viscosity of liquid
+surfaceTension <- 0.072  # N/m
+angle <- pi/2            # rad (positive means upward) - Pipe inclination 
+roughness <- 0.0001      # m  - Pipe roughness
+```
+
+```{r basic}
+# Predict flow regime, holdup, and pressure drop. 
+call_MB(vsG, vsL, ID, densityG, densityL,
+        viscosityG, viscosityL, surfaceTension, angle, roughness)
+```
+
+When you consider the acceleration term, you need to speficify `pressure`. 
+
+```{r basic2}
+pressure <- 100 * 100000    # 10000000 Pa (= 100 bar)
+call_MB(vsG, vsL, ID, densityG, densityL,
+        viscosityG, viscosityL, surfaceTension,
+        angle, roughness, pressure)
+```
+
+## Create flow regime maps
+
+```{r}
+vector_vsG <- 1:10
+vector_vsL <- 1:10
+angle2 <- - pi/ 6
+frm <- generate_frm_MB(vector_vsG, vector_vsL, ID, densityG, densityL,
+                       viscosityG, viscosityL, surfaceTension, angle2)
+
+# s (black): Stratified, S (green): Slug, B (blue): Bubble
+plot(frm, main="downward flow (-30 deg)")
+```
+
+If you use log-scale for axis, `vs_vector_MB()` may be helpful.
+
+```{r}
+# vs_vector_MB(from, to, num_points, log_scale)
+vector_vsG2 <- vs_vector_MB(0.1, 100, 10, TRUE)
+vector_vsL2 <- vs_vector_MB(0.1, 100, 10, TRUE)
+frm_wider <- generate_frm_MB(vector_vsG2, vector_vsL2, ID, densityG, densityL,
+                             viscosityG, viscosityL, surfaceTension, angle2)
+
+# s (black): Stratified, A (red): Annular, S (green): Slug, B (blue): Bubble
+plot(frm_wider, log="xy")
+vector_vsG2
+```
+
+----
+
+# Advanced
+
 
 ```{r setup}
 library(glfMB)
@@ -43,32 +112,6 @@ viscosityG <- viscosity_air(temperature)
 viscosityL <- testdata_MB$Kerosene_viscosity(temperature)
 surfaceTension <- testdata_MB$Kerosene_surfaceTension(temperature)
 ```
-
-----
-
-# Basic
-
-## Create flow regime maps
-
-```{r}
-vsG <- 1:10
-vsL <- 1:10
-frm <- generate_frm_MB(vsG, vsL, ID, densityG, densityL,
-                       viscosityG, viscosityL, surfaceTension, angle)
-plot(frm)
-
-# If you want to check flow regime in wide ranges of vsG and vsL, 
-# vs_vector_MB() may be useful.
-#   vs_vector_MB(from, to, num_points, log_scale)
-VsG_wider <- vs_vector_MB(0.1, 100, 10, TRUE)
-VsL_wider <- vs_vector_MB(0.1, 100, 10, TRUE)
-frm_wider <- generate_frm_MB(VsG_wider, VsL_wider, ID, densityG, densityL,
-                             viscosityG, viscosityL, surfaceTension, angle)
-plot(frm_wider, log="xy")
-```
-
-
-
 
 
 
