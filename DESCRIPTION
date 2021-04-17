@@ -1,9 +1,9 @@
-Package: glmMB
+Package: MukherjeeBrill
 Type: Package
-Title: A package for calculation of gas-liquid two-phase flow in a circular pipe
-Version: 0.4.4
+Title: Mukherjee & Brill model for gas-liquid two-phase flow in a circular pipe
+Version: 0.5.0
 Author: Shunsuke
-Maintainer: The package maintainer <yourself@somewhere.net>
+Maintainer: The package maintainer <s_shunske@yahoo.co.jp>
 Description: Mukherjee & Brill model for gas-liquid two-phase flow in a circular pipe
     More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.

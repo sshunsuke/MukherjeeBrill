@@ -5,7 +5,7 @@
 \alias{testdata_MB}
 \title{List of functions and constants for test (and example)}
 \format{
-An object of class \code{list} of length 13.
+An object of class \code{list} of length 10.
 }
 \usage{
 testdata_MB
@@ -23,9 +23,6 @@ SI unit is used.
 \item Kerosene_surfaceTension(temperature): K
 \item Kerosene_density(temperature) - kg/m3 (K, Pa)
 \item Kerosene_viscosity(temperature): K
-\item Lubricating_surfaceTension(temperature) - K
-\item Lubricating_density(temperature) - kg/m3 (K, Pa)
-\item Lubricating_viscosity(temperature) - K
 }
 }
 \examples{

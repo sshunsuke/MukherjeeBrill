@@ -1,4 +1,4 @@
-# glfMB - Gas-Liquid Flow model of Mukherjee and Brill
+# MukherjeeBrill - Gas-Liquid Flow model of Mukherjee and Brill
 
 R package for calculation of gas-liquid two-phase flow in a circular pipe with the model of Mukherjee &amp; Brill (1985) 
 
@@ -12,9 +12,9 @@ This R package provides functions to calculate flow regime, liquid holdup, and p
 
 ## Installing 
 
-```
+```r
 # install.packages("remotes")
-remotes::install_github("sshunsuke/glfMB")
+remotes::install_github("sshunsuke/MukherjeeBrill")
 ```
 
 ## Examples
@@ -22,7 +22,7 @@ remotes::install_github("sshunsuke/glfMB")
 Prediction of flow regime, holdup, and pressure drop. 
 
 ```r
-library(glfMB)
+library(MukherjeeBrill)
 
 # Flow conditions (SI unit is used for all properties)
 vsG <- 5                 # m/s   - superficial velocity of gas
@@ -44,7 +44,7 @@ call_MB(vsG, vsL, ID, densityG, densityL, viscosityG, viscosityL, surfaceTension
 
 Create a flow regime map. 
 
-```
+```r
 vector_vsG <- 1:10
 vector_vsL <- 1:10
 frm <- generate_frm_MB(vector_vsG, vector_vsL, ID, densityG, densityL,
@@ -63,4 +63,6 @@ You can fine more examples [here](EXAMPLES.md).
 
 ## Related documents
 
+* Mukherjee, H., and Brill J. P. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
+* Mukherjee, H., and Brill J. P. 1983. Liquid Holdup Correlations for Inclined Two-Phase Flow. JPT, Journal of Petroleum Technology 35(5):1003–8.
 

@@ -17,12 +17,12 @@ viscosityG <- viscosity_air(temperature)
 viscosityL <- testdata_MB$Kerosene_viscosity(temperature)
 surfaceTension <- testdata_MB$Kerosene_surfaceTension(temperature)
 
-coefficient <- (densityL / glfMB:::g / surfaceTension)^(0.25)
+coefficient <- (densityL / MukherjeeBrill:::g / surfaceTension)^(0.25)
 
 
-test_that("vs_vector_MB()", {
-  expect_equal(vs_vector_MB(1, 5, 5), 1:5)
-  expect_equal(vs_vector_MB(0.1, 100, 4, TRUE), c(0.1, 1, 10, 100))
+test_that("util_MB_vs_vector()", {
+  expect_equal(util_MB_vs_vector(1, 5, 5), 1:5)
+  expect_equal(util_MB_vs_vector(0.1, 100, 4, TRUE), c(0.1, 1, 10, 100))
 })
 
 
@@ -31,7 +31,7 @@ test_that("vs_vector_MB()", {
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 
 test_that("Kerosene, -70 deg: Stratifired", {
-  angle <- glfMB:::rad2deg(-70)
+  angle <- MukherjeeBrill:::rad2deg(-70)
   NGv <- c(0.5,   5,  10, 1, 10, 2)
   NLv <- c(0.5, 0.5, 0.5, 1,  1, 2)
   dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
@@ -41,7 +41,7 @@ test_that("Kerosene, -70 deg: Stratifired", {
 })
 
 test_that("Kerosene, -70 deg: Annular", {
-  angle <- glfMB:::rad2deg(-70)
+  angle <- MukherjeeBrill:::rad2deg(-70)
   NGv <- c( 50, 100, 200, 300)
   NLv <- c(0.1,  1,    5,  8)
   dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
@@ -51,7 +51,7 @@ test_that("Kerosene, -70 deg: Annular", {
 })
 
 test_that("Kerosene, -70 deg: Slug", {
-  angle <- glfMB:::rad2deg(-70)
+  angle <- MukherjeeBrill:::rad2deg(-70)
   NGv <- c(10, 20, 20, 100)
   NLv <- c(10,  5, 10,   2)
   dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
@@ -61,7 +61,7 @@ test_that("Kerosene, -70 deg: Slug", {
 })
 
 test_that("Kerosene, -70 deg: Bubble", {
-  angle <- glfMB:::rad2deg(-70)
+  angle <- MukherjeeBrill:::rad2deg(-70)
   NGv <- c(0.1, 0.1, 1, 10, 100)
   NLv <- c(0.5, 100, 5, 20,  50)
   dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
@@ -71,7 +71,7 @@ test_that("Kerosene, -70 deg: Bubble", {
 })
 
 test_that("Kerosene, -70 deg: generate_frm_MB()", {
-  angle <- glfMB:::rad2deg(-70)
+  angle <- MukherjeeBrill:::rad2deg(-70)
   NGv <- c(0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200)
   NLv <- c(0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200)
 
@@ -136,7 +136,7 @@ test_that("Kerosene, 0 deg: Slug", {
 })
 
 test_that("Kerosene, 0 deg: generate_frm_MB()", {
-  angle <- glfMB:::rad2deg(0)
+  angle <- MukherjeeBrill:::rad2deg(0)
   NGv <- c(0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200)
   NLv <- c(0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200)
   
@@ -168,7 +168,7 @@ test_that("Kerosene, 0 deg: generate_frm_MB()", {
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 
 test_that("flow_regime_MB(): Kerosene, 70 deg, Annular", {
-  angle <- glfMB:::rad2deg(70)
+  angle <- MukherjeeBrill:::rad2deg(70)
   NGv <- c( 50, 100, 200)
   NLv <- c(0.2,   1,   5)
   dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
@@ -178,7 +178,7 @@ test_that("flow_regime_MB(): Kerosene, 70 deg, Annular", {
 })
 
 test_that("flow_regime_MB(): Kerosene, 70 deg, Slug", {
-  angle <- glfMB:::rad2deg(70)
+  angle <- MukherjeeBrill:::rad2deg(70)
   NGv <- c(0.1, 1, 10,  50,  50)
   NLv <- c(0.2, 2, 20, 0.5, 100)
   dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
@@ -188,7 +188,7 @@ test_that("flow_regime_MB(): Kerosene, 70 deg, Slug", {
 })
 
 test_that("flow_regime_MB(): Kerosene, 70 deg, Bubble", {
-  angle <- glfMB:::rad2deg(-70)
+  angle <- MukherjeeBrill:::rad2deg(-70)
   NGv <- c(0.1, 1, 10, 50)
   NLv <- c(0.5, 5, 50, 200)
   dlns <- l_dlns_MB(NGv/coefficient, NLv/coefficient,
@@ -198,7 +198,7 @@ test_that("flow_regime_MB(): Kerosene, 70 deg, Bubble", {
 })
 
 test_that("Kerosene, 70 deg upflow: generate_frm_MB()", {
-  angle <- glfMB:::rad2deg(70)
+  angle <- MukherjeeBrill:::rad2deg(70)
   NGv <- c(0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200)
   NLv <- c(0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200)
   

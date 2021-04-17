@@ -7,19 +7,24 @@
 l_Darcy_friction_factor(Re, roughness, D, tol = 1e-08, itMax = 10)
 }
 \arguments{
-\item{Re}{Reynold number}
+\item{Re}{Reynolds number}
 
 \item{roughness}{Pipe roughness}
 
 \item{D}{Pipe diameter}
 
-\item{tol}{Tolerance in `Colebrook()` (optional)}
+\item{tol}{Tolerance in \code{util_MB_Colebrook()} (optional)}
 
-\item{itMax}{Maximum number of iteration in `Colebrook()` (optional)}
+\item{itMax}{Maximum number of iteration in \code{util_MB_Colebrook()} (optional)}
 }
 \value{
 Darcy friction factor
 }
 \description{
-Calculate the Darcy friction factor considering pipe roughness.
+Calculate the Darcy friction factor considering Reynolds number and pipe roughness.
+\itemize{
+\item Re <= 2000: Laminar flow (= 64/Re)
+\item Re >= 4000: Turbulent flow (Colebrook correlation)
+\item 2000 < Re < 4000: Transition (see details)
+}
 }

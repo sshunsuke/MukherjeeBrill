@@ -1,8 +1,8 @@
 ---
-title: "Example code with glfMB"
+title: "Example code with MukherjeeBrill"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{glfMB}
+  %\VignetteIndexEntry{MukherjeeBrill}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r }
-library(glfMB)
+library(MukherjeeBrill)
 ```
 
 ----
@@ -68,12 +68,12 @@ frm <- generate_frm_MB(vector_vsG, vector_vsL, ID, densityG, densityL,
 plot(frm, main="downward flow (-30 deg)")
 ```
 
-If you use log-scale for axis, `vs_vector_MB()` may be helpful.
+If you use log-scale for axis, `util_MB_vs_vector()` may be helpful.
 
 ```{r}
 # vs_vector_MB(from, to, num_points, log_scale)
-vector_vsG2 <- vs_vector_MB(0.1, 100, 10, TRUE)
-vector_vsL2 <- vs_vector_MB(0.1, 100, 10, TRUE)
+vector_vsG2 <- util_MB_vs_vector(0.1, 100, 10, TRUE)
+vector_vsL2 <- util_MB_vs_vector(0.1, 100, 10, TRUE)
 frm_wider <- generate_frm_MB(vector_vsG2, vector_vsL2, ID, densityG, densityL,
                              viscosityG, viscosityL, surfaceTension, angle2)
 
@@ -168,7 +168,7 @@ df
 
 
 ```{r setup}
-library(glfMB)
+library(MukherjeeBrill)
 
 # Basic settings
 temperature <- 10 + 273.15   # 10 degC

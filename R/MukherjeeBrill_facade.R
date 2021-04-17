@@ -112,10 +112,10 @@ call_MB <- function(vsG, vsL, ID, densityG, densityL,
 #' * `NGv`, `NLv`, `NL`, `NGvSM`, `NGvBS`, `NLvBS_up`, `NLvST`: Internal properties used in the prediction of flow regime
 #'
 #' @examples
-#' vs_range = glfMB::vs_vector_MB(0.1, 10, 20, TRUE)
+#' vs_range = MukherjeeBrill::util_MB_vs_vector(0.1, 10, 20, TRUE)
 #' frm <- generate_frm_MB(vs_range, vs_range, 0.1,
 #'                        40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
-#' plot(frm)    # glfMB:::plot.frm_MB(frm)
+#' plot(frm)    # MukherjeeBrill:::plot.frm_MB(frm)
 #'
 #' @references
 #' Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
@@ -125,7 +125,7 @@ call_MB <- function(vsG, vsL, ID, densityG, densityL,
 generate_frm_MB <- function(vector_vsG, vector_vsL, D, densityG, densityL,
                             viscosityG, viscosityL, surfaceTension, angle) {
   pairs_vs <- expand.grid(vector_vsG, vector_vsL)
-  frm <- glfMB:::frm0_MB(pairs_vs[,1], pairs_vs[,2], D, densityG, densityL,
+  frm <- MukherjeeBrill:::frm0_MB(pairs_vs[,1], pairs_vs[,2], D, densityG, densityL,
                          viscosityG, viscosityL, surfaceTension, angle)
   frm
 }
@@ -155,10 +155,10 @@ frm0_MB <- function(vsG, vsL, D, densityG, densityL,
 #' @param ... graphical parameters to plot
 #'
 #' @examples
-#' vs_range = glfMB::vs_vector_MB(0.1, 10, 20, TRUE)
+#' vs_range = MukherjeeBrill::util_MB_vs_vector(0.1, 10, 20, TRUE)
 #' frm <- generate_frm_MB(vs_range, vs_range, 0.1,
 #'                        40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
-#' plot(frm)    # glfMB:::plot.frm_MB(frm)
+#' plot(frm)    # MukherjeeBrill:::plot.frm_MB(frm)
 #' 
 #' @references
 #' Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
@@ -198,7 +198,7 @@ plot.frm_MB <- function(x, xlab, ylab, xval='vsG', yval='vsL', ...) {
 #' @param Re Reynold number
 #' @return Darcy friction factor
 #' @export
-Blasius <- function(Re) {
+util_MB_Blasius <- function(Re) {
   0.3164 / (Re ^ 0.25)
 }
 
@@ -217,8 +217,8 @@ Blasius <- function(Re) {
 #'
 #' @return Darcy friction factor
 #' @export
-Colebrook <- function(Re, roughness, D, tol=1e-8, itMax=10, warn=TRUE) {
-  mapply(glfMB:::Colebrook_core, Re, roughness, D, tol, itMax, warn)
+util_MB_Colebrook <- function(Re, roughness, D, tol=1e-8, itMax=10, warn=TRUE) {
+  mapply(MukherjeeBrill:::Colebrook_core, Re, roughness, D, tol, itMax, warn)
 }
 
 
@@ -236,13 +236,13 @@ Colebrook <- function(Re, roughness, D, tol=1e-8, itMax=10, warn=TRUE) {
 #' @return a vector of superficial velocities
 #' 
 #' @examples
-#' vs_vector_MB(1, 100, 5)
+#' util_MB_vs_vector(1, 100, 5)
 #' # 1  25.75  50.50  75.25  100
-#' vs_vector_MB(1, 100, 5, TRUE)
+#' util_MB_vs_vector(1, 100, 5, TRUE)
 #' # 1  3.162278  10  31.622777  100
 #'
 #' @export
-vs_vector_MB <- function(from, to, num_points, log_scale) {
+util_MB_vs_vector <- function(from, to, num_points, log_scale) {
   log_scale <- ifelse(missing(log_scale), FALSE, log_scale)
   
   stopifnot(from < to)
@@ -259,6 +259,10 @@ vs_vector_MB <- function(from, to, num_points, log_scale) {
 
 # testdata_MB$ ----
 
+# * Lubricating_surfaceTension(temperature) - K
+# * Lubricating_density(temperature) - kg/m3 (K, Pa)
+# * Lubricating_viscosity(temperature) - K
+
 #' List of functions and constants for test (and example)
 #' 
 #' A list containing functions and constants for fluid properties used in tests (see also Value).
@@ -272,9 +276,7 @@ vs_vector_MB <- function(from, to, num_points, log_scale) {
 #' * Kerosene_surfaceTension(temperature): K
 #' * Kerosene_density(temperature) - kg/m3 (K, Pa)
 #' * Kerosene_viscosity(temperature): K
-#' * Lubricating_surfaceTension(temperature) - K
-#' * Lubricating_density(temperature) - kg/m3 (K, Pa)
-#' * Lubricating_viscosity(temperature) - K
+
 #' 
 #' @name testdata_MB
 #' @docType data
@@ -304,7 +306,7 @@ testdata_MB <- list(
   
   # Density of ideal gas
   ideal_gas_density = function(temperature, pressure, M) {
-    pressure * M / (glfMB:::R * temperature)
+    pressure * M / (MukherjeeBrill:::R * temperature)
   },
     
   # Sutherland's formula
@@ -321,22 +323,23 @@ testdata_MB <- list(
   },
   Kerosene_viscosity = function(temperature) {
     1e-03 * exp(1.0664 - 0.0207 * (temperature-273.15))   # Pa
-  },
+  }
+  #,
     
     
     
     
     
   # Lubricating Oil (Mukherjee & Brill, 1985)
-  Lubricating_surfaceTension = function(temperature) {
-    (36.6094 - 0.117 * (temperature-273.15)) / 1000       # N/m
-  },
-  Lubricating_density = function(temperature) {
-    861.22 - 0.7585 * (temperature-273.15)                # kg/m3
-  },
-  Lubricating_viscosity = function(temperature) {
-    1e-03 * exp(3.99 - 0.0412 * (temperature-273.15))     # Pa
-  }
+  # Lubricating_surfaceTension = function(temperature) {
+  #   (36.6094 - 0.117 * (temperature-273.15)) / 1000       # N/m
+  # },
+  # Lubricating_density = function(temperature) {
+  #   861.22 - 0.7585 * (temperature-273.15)                # kg/m3
+  # },
+  # Lubricating_viscosity = function(temperature) {
+  #   1e-03 * exp(3.99 - 0.0412 * (temperature-273.15))     # Pa
+  # }
     
 )
 

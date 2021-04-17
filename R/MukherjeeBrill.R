@@ -1,4 +1,4 @@
-#' glfMB - Gas-Liquid Flow model of Mukherjee and Brill
+#' MukherjeeBrill - Mukherjee & Brill model for gas-liquid two phase flow
 #'
 #' A package for calculation of gas-liquid two-phase flow in a circular pipe
 #' with the model of Mukherjee and Brill (1985), which predicts flow regime, liquid holdup, and pressure drop.
@@ -8,7 +8,7 @@
 #' * Mukherjee, H., and Brill J. P. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
 #' * Mukherjee, H., and Brill J. P. 1983. Liquid Holdup Correlations for Inclined Two-Phase Flow. JPT, Journal of Petroleum Technology 35(5):1003–8.
 #'
-#' @name glfMB
+#' @name MukherjeeBrill
 #' @docType package
 #' @import stats
 #' @md
@@ -36,7 +36,7 @@ Colebrook_core <- function(Re, roughness, D, tol, itMax, warn) {
     - fD^(-3/2) * (1/2 + 2.51 / log(10) / (2.51 / Re / sqrt(fD) + roughness / 3.71 / D) / Re)
   }
   
-  fD_n <- glfMB:::Blasius(Re)
+  fD_n <- MukherjeeBrill:::util_MB_Blasius(Re)
   d <- fun(fD_n) / dFun(fD_n)
   
   # Newton-Raphson method
@@ -59,9 +59,9 @@ laminar <- function(Re) {
   64 / Re
 }
 
-transition <- function(Re, roughness, D, tol=1e-8, itMax=10, warn=TRUE) {
-  fl <- glfMB:::laminar(Re)
-  ft <- glfMB:::Colebrook(Re, roughness, D, warn=FALSE)
+transition <- function(Re, roughness, D, tol=1e-8, itMax=10, warn=FALSE) {
+  fl <- MukherjeeBrill:::laminar(Re)
+  ft <- util_MB_Colebrook(Re, roughness, D, tol=tol, itMax=itMax, warn=warn)
 
   (fl * (4000 - Re) + ft * (Re - 2000)) / 2000
 }
@@ -69,27 +69,32 @@ transition <- function(Re, roughness, D, tol=1e-8, itMax=10, warn=TRUE) {
 
 #' Low-level function to calculate the Darcy friction factor
 #' 
-#' Calculate the Darcy friction factor considering pipe roughness. 
+#' Calculate the Darcy friction factor considering Reynolds number and pipe roughness. 
+#' * Re <= 2000: Laminar flow (= 64/Re)
+#' * Re >= 4000: Turbulent flow (Colebrook correlation)
+#' * 2000 < Re < 4000: Transition (see details)
 #'
-#' @param Re Reynold number
+#' @param Re Reynolds number
 #' @param roughness Pipe roughness
 #' @param D Pipe diameter
-#' @param tol Tolerance in `Colebrook()` (optional)
-#' @param itMax Maximum number of iteration in `Colebrook()` (optional)
+#' @param tol Tolerance in `util_MB_Colebrook()` (optional)
+#' @param itMax Maximum number of iteration in `util_MB_Colebrook()` (optional)
 #'
 #' @return Darcy friction factor
+#' 
 #' @export
+#' @md
 l_Darcy_friction_factor <- function(Re, roughness, D, tol=1e-8, itMax=10) {
-  mapply(glfMB:::l_Darcy_friction_factor_core, Re, roughness, D, tol, itMax)
+  mapply(MukherjeeBrill:::l_Darcy_friction_factor_core, Re, roughness, D, tol, itMax)
 }
 
-l_Darcy_friction_factor_core <- function(Re, roughness, D, tol, itMax) {
+l_Darcy_friction_factor_core <- function(Re, roughness, D, tol=1e-8, itMax=10) {
   if (Re >= 4000) {
-    ret <- glfMB:::Colebrook(Re, roughness, D)
+    ret <- util_MB_Colebrook(Re, roughness, D, tol=tol, itMax=itMax)
   } else if (Re <= 2000) {
-    ret <- glfMB:::laminar(Re)
+    ret <- MukherjeeBrill:::laminar(Re)
   } else {
-    ret <- glfMB:::transition(Re, roughness, D)
+    ret <- MukherjeeBrill:::transition(Re, roughness, D, tol=tol, itMax=itMax)
   }
   ret
 }
@@ -150,7 +155,7 @@ l_Darcy_friction_factor_core <- function(Re, roughness, D, tol, itMax) {
 #' @md
 
 l_dlns_MB <- function(vsG, vsL, ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle) {
-  g <- glfMB:::g
+  g <- MukherjeeBrill:::g
 
   NLv <- vsL * (densityL / g / surfaceTension)^(0.25)
   NGv <- vsG * (densityL / g / surfaceTension)^(0.25)
@@ -214,7 +219,7 @@ l_dlns_MB <- function(vsG, vsL, ID, densityG, densityL, viscosityG, viscosityL, 
 #' @export
 #' @md
 l_flow_regime_MB <- function(DLNs) {
-  mapply(glfMB:::l_flow_regime_MB_core,
+  mapply(MukherjeeBrill:::l_flow_regime_MB_core,
          DLNs$NGv, DLNs$NLv, DLNs$angle, DLNs$NGvSM, DLNs$NGvBS, DLNs$NLvBS_up, DLNs$NLvST)
 }
 
@@ -245,7 +250,7 @@ l_flow_regime_MB_core <- function(NGv, NLv, angle, NGvSM, NGvBS, NLvBS_up, NLvST
     } else {
       flowRegime <- 3  # slug
     }
-  } else if (abs(angle) > glfMB:::deg2rad(30)) {
+  } else if (abs(angle) > MukherjeeBrill:::deg2rad(30)) {
     # Downhill
     if (NGv > NGvBS) {
       if (NLv > NLvST) {
@@ -327,7 +332,7 @@ l_dPdL_MB <- function(DLNs, flowRegime, HL, roughness, pressure, debug=FALSE) {
     pressure <- NA
   }
 
-  t(mapply(glfMB:::l_dPdL_core_MB,
+  t(mapply(MukherjeeBrill:::l_dPdL_core_MB,
            DLNs$ID, DLNs$vsG, DLNs$vsL, DLNs$densityG, DLNs$densityL,
            DLNs$viscosityG, DLNs$viscosityL, DLNs$angle,
            flowRegime, HL, roughness, pressure, debug))
@@ -348,7 +353,7 @@ ffRatio <- (function(){
 
 l_dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosityL, angle,
                            flowRegime, HL, roughness, pressure, debug) {
-  g <- glfMB:::g
+  g <- MukherjeeBrill:::g
 
   if (flowRegime == 1) {
     # Stratified
@@ -359,7 +364,7 @@ l_dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosit
     delta <- f$root
 
     # Flow area of each phase
-    A  <- glfMB:::circle_area(D)
+    A  <- MukherjeeBrill:::circle_area(D)
     AL <- A * HL         # (4.147)
     AG <- A * (1 - HL)
 
@@ -378,11 +383,11 @@ l_dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosit
     vG <- vsG / (1-HL)           # 4.157
     vL <- vsL / HL               # 4.156
 
-    ReG <- glfMB:::Reynolds(densityG, vG, dhG, viscosityG)   # (4.155)
-    ReL <- glfMB:::Reynolds(densityL, vL, dhL, viscosityL)   # (4.154)
+    ReG <- MukherjeeBrill:::Reynolds(densityG, vG, dhG, viscosityG)   # (4.155)
+    ReL <- MukherjeeBrill:::Reynolds(densityL, vL, dhL, viscosityL)   # (4.154)
 
-    fDG <- glfMB:::l_Darcy_friction_factor_core(ReG, roughness, D)
-    fDL <- glfMB:::l_Darcy_friction_factor_core(ReL, roughness, D)
+    fDG <- MukherjeeBrill:::l_Darcy_friction_factor_core(ReG, roughness, D)
+    fDL <- MukherjeeBrill:::l_Darcy_friction_factor_core(ReL, roughness, D)
 
     # Wall shear stress = (D/4) * dPdL
     shearStressG <- fDG * densityG * vG^2 / 8      # 4.153
@@ -407,19 +412,19 @@ l_dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosit
     viscosityMixS <- viscosityG * (1 - HL) + viscosityL * HL              # (3.19)
     viscosityMixN <- viscosityG * (1 - HLnoslip) + viscosityL * HLnoslip  # (3.21)
 
-    ReN <- glfMB:::Reynolds(densityMixN, vmix, D, viscosityMixN)
+    ReN <- MukherjeeBrill:::Reynolds(densityMixN, vmix, D, viscosityMixN)
 
     if (flowRegime == 2) {
       # Annular
-      fn <- glfMB:::l_Darcy_friction_factor_core(ReN, roughness, D)    # no-slip friction factor
+      fn <- MukherjeeBrill:::l_Darcy_friction_factor_core(ReN, roughness, D)    # no-slip friction factor
       HR <- HLnoslip / HL                    # (4.140)
-      fR <- glfMB:::ffRatio(HR)              # friction factor ratio
+      fR <- MukherjeeBrill:::ffRatio(HR)              # friction factor ratio
       fD <- fn * fR                          # (4.141)
       
       dPdL_F <- fD * densityMixN * vmix^2 / (2 * D)
     } else if (flowRegime == 3 | flowRegime == 4) {
       # Slug or Bubble
-      fD <- glfMB:::l_Darcy_friction_factor_core(ReN, roughness, D)
+      fD <- MukherjeeBrill:::l_Darcy_friction_factor_core(ReN, roughness, D)
       dPdL_F <- fD * densityMixS * vmix^2 / (2 * D)
     } else {
       # error!

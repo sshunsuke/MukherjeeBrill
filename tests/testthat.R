@@ -1,10 +1,10 @@
 # Code in this file runs all your tests when R CMD check runs.
 
 library(testthat)
-library(glfMB)
+library(MukherjeeBrill)
 
 
 
 
 
-test_check("glfMB")
+test_check("MukherjeeBrill")

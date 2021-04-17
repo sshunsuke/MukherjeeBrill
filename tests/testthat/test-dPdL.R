@@ -17,7 +17,7 @@ test_that("l_dPdL_core_MB(): Stratified flow", {
   
   # stratified (holdup = 0.5, angle = 0)
   holdup <- 0.5
-  ret_st <- glfMB:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL, 0,
+  ret_st <- MukherjeeBrill:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL, 0,
                                    fr, holdup, roughness, pressure, TRUE)
   
   exp_dh  <- (pi*ID/2) / (1+pi/2)                                # Dh = 4A / P
@@ -31,8 +31,8 @@ test_that("l_dPdL_core_MB(): Stratified flow", {
   expect_equal(ret_st['dhL'], c('dhL' = exp_dh))    # = 4AL / PL
   expect_equal(ret_st['ReG'], c('ReG' = exp_ReG))
   expect_equal(ret_st['ReL'], c('ReL' = exp_ReL))
-  expect_equal(ret_st['fDG'], c('fDG' = Colebrook(exp_ReG, roughness, ID)))
-  expect_equal(ret_st['fDL'], c('fDL' = Colebrook(exp_ReL, roughness, ID)))
+  expect_equal(ret_st['fDG'], c('fDG' = util_MB_Colebrook(exp_ReG, roughness, ID)))
+  expect_equal(ret_st['fDL'], c('fDL' = util_MB_Colebrook(exp_ReL, roughness, ID)))
   
   dPdL_FG <- ret_st['fDG'] * densityG * (vsG/0.5)^2 / 2 / ID
   dPdL_FL <- ret_st['fDL'] * densityL * (vsL/0.5)^2 / 2 / ID 
@@ -43,7 +43,7 @@ test_that("l_dPdL_core_MB(): Stratified flow", {
   
   # stratified (holdup = 3/4 + 1/(2*pi), angle = 0)
   holdup2 <- 3/4 + 1/(2*pi)
-  ret_st2 <- glfMB:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL, 0,
+  ret_st2 <- MukherjeeBrill:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL, 0,
                                     fr, holdup2, roughness, pressure, TRUE)
   
   exp_dhG2 <- 4*(1-holdup2)*(ID/2)^2*pi / (ID*pi*1/4 + sqrt(2)*ID/2)    # = 4AG / PG
@@ -58,8 +58,8 @@ test_that("l_dPdL_core_MB(): Stratified flow", {
   expect_equal(ret_st2['dhL'], c('dhL' = exp_dhL2))
   expect_equal(ret_st2['ReG'], c('ReG' = exp_ReG2))
   expect_equal(ret_st2['ReL'], c('ReL' = exp_ReL2))
-  expect_equal(ret_st2['fDG'], c('fDG' = Colebrook(exp_ReG2, roughness, ID)))
-  expect_equal(ret_st2['fDL'], c('fDL' = Colebrook(exp_ReL2, roughness, ID)))
+  expect_equal(ret_st2['fDG'], c('fDG' = util_MB_Colebrook(exp_ReG2, roughness, ID)))
+  expect_equal(ret_st2['fDL'], c('fDL' = util_MB_Colebrook(exp_ReL2, roughness, ID)))
   
   dPdL_FG2 <- ret_st2['fDG'] * densityG * (vsG/(1-holdup2))^2 / 2 / ID
   dPdL_FL2 <- ret_st2['fDL'] * densityL * (vsL/holdup2)^2     / 2 / ID 
@@ -68,7 +68,7 @@ test_that("l_dPdL_core_MB(): Stratified flow", {
   
   
   # stratified (holdup = 0.5, angle = -90 deg)
-  ret_st3 <- glfMB:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL, -pi/2,
+  ret_st3 <- MukherjeeBrill:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL, -pi/2,
                                     fr, 0.5, roughness, pressure, TRUE)
   
   expect_equal(ret_st3['delta'], c('delta' = pi))      # angle related to liquid level
@@ -78,14 +78,14 @@ test_that("l_dPdL_core_MB(): Stratified flow", {
   expect_equal(ret_st3['dhL'], c('dhL' = exp_dh))    # = 4AL / PL
   expect_equal(ret_st3['ReG'], c('ReG' = exp_ReG))
   expect_equal(ret_st3['ReL'], c('ReL' = exp_ReL))
-  expect_equal(ret_st3['fDG'], c('fDG' = Colebrook(exp_ReG, roughness, ID)))
-  expect_equal(ret_st3['fDL'], c('fDL' = Colebrook(exp_ReL, roughness, ID)))
-  expect_equal(as.numeric(ret_st3['dPdL']), as.numeric(dPdL_FG/2 + dPdL_FL/2 - (densityG + densityL)/2 * glfMB:::g))
+  expect_equal(ret_st3['fDG'], c('fDG' = util_MB_Colebrook(exp_ReG, roughness, ID)))
+  expect_equal(ret_st3['fDL'], c('fDL' = util_MB_Colebrook(exp_ReL, roughness, ID)))
+  expect_equal(as.numeric(ret_st3['dPdL']), as.numeric(dPdL_FG/2 + dPdL_FL/2 - (densityG + densityL)/2 * MukherjeeBrill:::g))
   
   # stratified (holdup = 0.5, angle = -30 deg)
-  ret_st4 <- glfMB:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL, -pi/6,
+  ret_st4 <- MukherjeeBrill:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL, -pi/6,
                                     fr, 0.5, roughness, pressure, TRUE)
-  expect_equal(as.numeric(ret_st4['dPdL']), as.numeric(dPdL_FG/2 + dPdL_FL/2 + sin(-pi/6) * (densityG + densityL)/2 * glfMB:::g))
+  expect_equal(as.numeric(ret_st4['dPdL']), as.numeric(dPdL_FG/2 + dPdL_FL/2 + sin(-pi/6) * (densityG + densityL)/2 * MukherjeeBrill:::g))
 })
 
 
@@ -97,7 +97,7 @@ test_that("l_dPdL_core_MB(): Annular flow", {
   
   # annular (holdup = 0.5, angle = 0)
   holdup <- 0.5
-  ret_an <- glfMB:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL, 0,
+  ret_an <- MukherjeeBrill:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL, 0,
                                    fr, holdup, roughness, pressure, TRUE)
   
   holdup_noslip <- vsL / (vsL+vsG)    # 1 / (1+3) = 0.25
@@ -110,8 +110,8 @@ test_that("l_dPdL_core_MB(): Annular flow", {
   expect_equal(ret_an['densityMixN'], c('densityMixN'=densityG*0.75+densityL*0.25))
   expect_equal(ret_an['viscosityMixN'], c('viscosityMixN'=viscosityG*0.75+viscosityL*0.25))
   expect_equal(ret_an['ReN'], c('ReN'=exp_ReN))
-  expect_equal(ret_an['fn'], c('fn' = Colebrook(exp_ReN, roughness, ID)))
-  expect_equal(ret_an['fD'], c('fD' = Colebrook(exp_ReN, roughness, ID) * 1.3))
+  expect_equal(ret_an['fn'], c('fn' = util_MB_Colebrook(exp_ReN, roughness, ID)))
+  expect_equal(ret_an['fD'], c('fD' = util_MB_Colebrook(exp_ReN, roughness, ID) * 1.3))
   expect_equal(ret_an['Ek'], c('Ek' = exp_Ek))
   
   exp_dPdL_F <- ret_an['fD'] * ret_an['densityMixN'] * (vsL+vsG)^2 / 2 / ID
@@ -124,18 +124,18 @@ test_that("l_dPdL_core_MB(): Annular flow", {
   
   
   # annular (holdup = 0.5, angle = -30 deg)
-  ret_an2 <- glfMB:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL,  -pi/6,
+  ret_an2 <- MukherjeeBrill:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL,  -pi/6,
                                     fr, holdup, roughness, pressure, TRUE)
   expect_equal(ret_an2['HR'], c('HR'=0.5))    # 0.25 / 0.5 = 0.5
   expect_equal(ret_an2['fR'], c('fR'=1.3))
   expect_equal(ret_an2['densityMixN'], c('densityMixN'=densityG*0.75+densityL*0.25))
   expect_equal(ret_an2['viscosityMixN'], c('viscosityMixN'=viscosityG*0.75+viscosityL*0.25))
   expect_equal(ret_an2['ReN'], c('ReN'=exp_ReN))
-  expect_equal(ret_an2['fn'], c('fn' = Colebrook(exp_ReN, roughness, ID)))
-  expect_equal(ret_an2['fD'], c('fD' = Colebrook(exp_ReN, roughness, ID) * 1.3))
+  expect_equal(ret_an2['fn'], c('fn' = util_MB_Colebrook(exp_ReN, roughness, ID)))
+  expect_equal(ret_an2['fD'], c('fD' = util_MB_Colebrook(exp_ReN, roughness, ID) * 1.3))
   expect_equal(ret_an2['Ek'], c('Ek' = exp_Ek))
   
-  exp_dPdL_H <- sin(-pi/6) * (densityG + densityL)/2 * glfMB:::g
+  exp_dPdL_H <- sin(-pi/6) * (densityG + densityL)/2 * MukherjeeBrill:::g
   
   expect_equal(ret_an2['dPdL_F'], c('dPdL_F' = exp_dPdL_F))
   expect_equal(ret_an2['dPdL_H'], c('dPdL_H' = exp_dPdL_H))
@@ -152,7 +152,7 @@ test_that("l_dPdL_core_MB(): Bubble flow", {
   
   # Bubble (holdup = 0.5, angle = 0)
   holdup <- 0.5
-  ret_b <- glfMB:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL, 0,
+  ret_b <- MukherjeeBrill:::l_dPdL_core_MB(ID, vsG, vsL, densityG, densityL, viscosityG, viscosityL, 0,
                                   fr, holdup, roughness, pressure, TRUE)
   exp_ReN <- as.numeric(ID * ret_b['densityMixN'] * (vsG+vsL) / ret_b['viscosityMixN'])
   exp_densityMixS <- densityG*0.5+densityL*0.5
@@ -161,7 +161,7 @@ test_that("l_dPdL_core_MB(): Bubble flow", {
   expect_equal(ret_b['densityMixN'], c('densityMixN'=densityG*0.25+densityL*0.75))
   expect_equal(ret_b['viscosityMixN'], c('viscosityMixN'=viscosityG*0.25+viscosityL*0.75))
   expect_equal(ret_b['ReN'], c('ReN'=exp_ReN))
-  expect_equal(ret_b['fD'], c('fD' = Colebrook(exp_ReN, roughness, ID)))
+  expect_equal(ret_b['fD'], c('fD' = util_MB_Colebrook(exp_ReN, roughness, ID)))
   expect_equal(ret_b['Ek'], c('Ek' = exp_Ek))
   
   

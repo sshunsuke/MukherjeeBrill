@@ -23,10 +23,10 @@
 This function is automatically called by plot() when the class is \code{frm_MB}.
 }
 \examples{
-vs_range = glfMB::vs_vector_MB(0.1, 10, 20, TRUE)
+vs_range = MukherjeeBrill::util_MB_vs_vector(0.1, 10, 20, TRUE)
 frm <- generate_frm_MB(vs_range, vs_range, 0.1,
                        40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
-plot(frm)    # glfMB:::plot.frm_MB(frm)
+plot(frm)    # MukherjeeBrill:::plot.frm_MB(frm)
 
 }
 \references{
