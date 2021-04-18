@@ -8,9 +8,9 @@
 
 #' Calculate flow regime, holdup, and pressure drop with the model of Mukherjee and Brill (1985)
 #'
-#' Call core functions of Mukherjee & Brill model: `l_dlns_MB()`, `l_flow_regime_MB()`,
-#' `l_holdup_MB()`, and `l_dPdL_MB()` to calculate flow regime, holdup, and pressure drop.
-#' The last argument (`pressure`) is for consideration of accelaration, which you can ignore.
+#' Call core functions of Mukherjee & Brill model: [l_dlns_MB()], [l_flow_regime_MB()],
+#' [l_holdup_MB()], and [l_dPdL_MB()] to calculate flow regime, holdup, and pressure drop.
+#' The last argument, `pressure`, is an optional parameter to consider accelaration.
 #'
 #' @usage call_MB(vsG, vsL, ID, densityG, densityL,
 #'         viscosityG, viscosityL, surfaceTension,
@@ -36,10 +36,25 @@
 #' * `dPdL_F`: Pressure drop per unit length due to friction - Pa/m
 #' * `dPdL_A`: Pressure drop per unit length due to acceleration - Pa/m
 #'
+#' @note You can execute the calculation step by step by calling low-level functions if you need. Below is an example.
+#' ```
+#' dlns <- l_dlns_MB(vsG, vsL, ID, densityG, densityL,
+#'                   viscosityG, viscosityL, surfaceTension, angle)
+#' fr <- l_flow_regime_MB(dlns)
+#' hl <- l_holdup_MB(dlns, fr)
+#' dPdL <- l_dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
+#' ```
+#'
 #' @references
 #' * Mukherjee, H., and J. P. Brill. 1985. Pressure Drop Correlations for Inclined Two-Phase Flow. Journal of Energy Resources Technology, Transactions of the ASME 107 (4)
 #' * Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
 #' * J. P. Brill., and Mukherjee, H. 1999. Multiphase Flow in Wells. Society of Petroleum Engineers.
+#'
+#' @seealso
+#' * [l_dlns_MB()]
+#' * [l_flow_regime_MB()]
+#' * [l_holdup_MB()]
+#' * [l_dPdL_MB()]
 #'
 #' @examples
 #' # This example is from Brill and Mukherjee (1999)
@@ -60,15 +75,6 @@
 #' call_MB(vsG, vsL, ID, densityG, densityL,
 #'         viscosityG, viscosityL, surfaceTension,
 #'         angle, roughness, pressure)
-#'
-#' @note You can execute the calculation step by step by calling low-level functions if you need. Below is an example.
-#' ```
-#' dlns <- l_dlns_MB(vsG, vsL, ID, densityG, densityL,
-#'                   viscosityG, viscosityL, surfaceTension, angle)
-#' fr <- l_flow_regime_MB(dlns)
-#' hl <- l_holdup_MB(dlns, fr)
-#' dPdL <- l_dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
-#' ```
 #'
 #' @export
 #' @md
@@ -111,14 +117,16 @@ call_MB <- function(vsG, vsL, ID, densityG, densityL,
 #' * `fr`: Flow regime (1: Stratified, 2: Annular, 3: Slug, and 4: Bubbly)
 #' * `NGv`, `NLv`, `NL`, `NGvSM`, `NGvBS`, `NLvBS_up`, `NLvST`: Internal properties used in the prediction of flow regime
 #'
+#' @references
+#' Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
+#'
+#' @seealso [plot.frm_MB()]
+#'
 #' @examples
 #' vs_range = MukherjeeBrill::util_MB_vs_vector(0.1, 10, 20, TRUE)
 #' frm <- generate_frm_MB(vs_range, vs_range, 0.1,
 #'                        40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
 #' plot(frm)    # MukherjeeBrill:::plot.frm_MB(frm)
-#'
-#' @references
-#' Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
 #'
 #' @export
 #' @md
@@ -154,14 +162,15 @@ frm0_MB <- function(vsG, vsL, D, densityG, densityL,
 #' @param yval 'vsL' or 'NLv' (optional)
 #' @param ... graphical parameters to plot
 #'
+#' @references
+#' Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
 #' @examples
 #' vs_range = MukherjeeBrill::util_MB_vs_vector(0.1, 10, 20, TRUE)
 #' frm <- generate_frm_MB(vs_range, vs_range, 0.1,
 #'                        40, 1002, 1.1E-05, 1.6E-03, 0.0695, pi/2)
 #' plot(frm)    # MukherjeeBrill:::plot.frm_MB(frm)
 #' 
-#' @references
-#' Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
+#' @seealso [generate_frm_MB()]
 #' 
 #' @importFrom graphics plot points
 #'
@@ -188,12 +197,16 @@ plot.frm_MB <- function(x, xlab, ylab, xval='vsG', yval='vsL', ...) {
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - -
-# Darcy friction factor ----
+# Utilities ----
+# - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# - - - - - - - - - - - - - - - - - - - - - - - - -
+# Darcy friction factor 
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #' Blasius correlation for the Darcy friction factor
 #'
-#' Calculate the Darcy friction factor with assuming a smooth pipe.
+#' Calculate the Darcy friction factor with Blasius correlation, assuming a smooth pipe.
 #'
 #' @param Re Reynold number
 #' @return Darcy friction factor
@@ -223,7 +236,7 @@ util_MB_Colebrook <- function(Re, roughness, D, tol=1e-8, itMax=10, warn=TRUE) {
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - -
-# Utilities ----
+# Generate a vector
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #' Generate a vector of superficial velocities

@@ -28,3 +28,6 @@ Calculate the Darcy friction factor considering Reynolds number and pipe roughne
 \item 2000 < Re < 4000: Transition (see details)
 }
 }
+\seealso{
+\code{\link[=util_MB_Blasius]{util_MB_Blasius()}}, \code{\link[=util_MB_Colebrook]{util_MB_Colebrook()}}
+}

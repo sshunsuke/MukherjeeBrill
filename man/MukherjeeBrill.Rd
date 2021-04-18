@@ -3,10 +3,10 @@
 \docType{package}
 \name{MukherjeeBrill}
 \alias{MukherjeeBrill}
-\title{MukherjeeBrill - Mukherjee & Brill model for gas-liquid two phase flow}
+\title{Mukherjee & Brill model for gas-liquid two phase flow in a circular pipe}
 \description{
-A package for calculation of gas-liquid two-phase flow in a circular pipe
-with the model of Mukherjee and Brill (1985), which predicts flow regime, liquid holdup, and pressure drop.
+This R package provides functions to calculate flow regime, liquid holdup,
+and pressure drop with the empirical model of Mukherjee & Brill (1985).
 }
 \references{
 \itemize{
@@ -14,4 +14,7 @@ with the model of Mukherjee and Brill (1985), which predicts flow regime, liquid
 \item Mukherjee, H., and Brill J. P. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
 \item Mukherjee, H., and Brill J. P. 1983. Liquid Holdup Correlations for Inclined Two-Phase Flow. JPT, Journal of Petroleum Technology 35(5):1003–8.
 }
+}
+\author{
+Shunsuke S
 }

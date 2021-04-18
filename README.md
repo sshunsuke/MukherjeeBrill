@@ -54,6 +54,22 @@ frm <- generate_frm_MB(vector_vsG, vector_vsL, ID, densityG, densityL,
 plot(frm)
 ```
 
+If you use log-scale for axis, `util_MB_vs_vector()` may be helpful.
+
+```r
+# vs_vector_MB(from, to, num_points, log_scale)
+vector_vsG2 <- util_MB_vs_vector(0.1, 100, 10, TRUE)
+vector_vsL2 <- util_MB_vs_vector(0.1, 100, 10, TRUE)
+frm_wider <- generate_frm_MB(vector_vsG2, vector_vsL2, ID,
+                             densityG, densityL,
+                             viscosityG, viscosityL,
+                             surfaceTension, angle2)
+
+# s (black): Stratified, A (red): Annular, S (green): Slug, B (blue): Bubble
+plot(frm_wider, log="xy", main="downward flow (-30 deg)", las=1)
+vector_vsG2
+```
+
 You can fine more examples [here](EXAMPLES.md). 
 
 
@@ -63,6 +79,7 @@ You can fine more examples [here](EXAMPLES.md).
 
 ## Related documents
 
-* Mukherjee, H., and Brill J. P. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
-* Mukherjee, H., and Brill J. P. 1983. Liquid Holdup Correlations for Inclined Two-Phase Flow. JPT, Journal of Petroleum Technology 35(5):1003–8.
+* Mukherjee, H. and Brill J. P. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
+* Mukherjee, H. and Brill J. P. 1983. Liquid Holdup Correlations for Inclined Two-Phase Flow. JPT, Journal of Petroleum Technology 35(5):1003–8.
+* Brill J. P. and Mukherjee, H. 1999. Multiphase Flow in Wells. Society of Petroleum Engineers.
 

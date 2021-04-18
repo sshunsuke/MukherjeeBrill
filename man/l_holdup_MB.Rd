@@ -4,10 +4,10 @@
 \alias{l_holdup_MB}
 \title{Low-level function to calculate holdup}
 \usage{
-l_holdup_MB(DLNs, flowRegime)
+l_holdup_MB(dlns, flowRegime)
 }
 \arguments{
-\item{DLNs}{dimensionless numbers calculated by \code{l_dlns_MB()}}
+\item{dlns}{dimensionless numbers calculated by \code{l_dlns_MB()}}
 
 \item{flowRegime}{flow regime estimated by \code{l_flow_regime_MB()}}
 }

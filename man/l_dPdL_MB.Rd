@@ -4,10 +4,10 @@
 \alias{l_dPdL_MB}
 \title{Low-level function to calculate pressure drop}
 \usage{
-l_dPdL_MB(DLNs, flowRegime, HL, roughness, pressure, debug = FALSE)
+l_dPdL_MB(dlns, flowRegime, HL, roughness, pressure, debug = FALSE)
 }
 \arguments{
-\item{DLNs}{dimensionless numbers calculated by \code{l_dlns_MB()}}
+\item{dlns}{dimensionless numbers calculated by \code{l_dlns_MB()}}
 
 \item{flowRegime}{flow regime estimated by \code{l_flow_regime_MB()}}
 

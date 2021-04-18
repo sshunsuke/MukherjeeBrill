@@ -1,15 +1,17 @@
-#' MukherjeeBrill - Mukherjee & Brill model for gas-liquid two phase flow
+#' Mukherjee & Brill model for gas-liquid two phase flow in a circular pipe
 #'
-#' A package for calculation of gas-liquid two-phase flow in a circular pipe
-#' with the model of Mukherjee and Brill (1985), which predicts flow regime, liquid holdup, and pressure drop.
+#' This R package provides functions to calculate flow regime, liquid holdup, 
+#' and pressure drop with the empirical model of Mukherjee & Brill (1985).
 #'
 #' @references
 #' * Mukherjee, H., and Brill J. P. 1985. Pressure Drop Correlations for Inclined Two-Phase Flow. Journal of Energy Resources Technology, Transactions of the ASME 107 (4)
 #' * Mukherjee, H., and Brill J. P. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
 #' * Mukherjee, H., and Brill J. P. 1983. Liquid Holdup Correlations for Inclined Two-Phase Flow. JPT, Journal of Petroleum Technology 35(5):1003–8.
 #'
-#' @name MukherjeeBrill
+#' @name MukherjeeBrill 
 #' @docType package
+#' @author Shunsuke S
+#' 
 #' @import stats
 #' @md
 NULL
@@ -82,6 +84,8 @@ transition <- function(Re, roughness, D, tol=1e-8, itMax=10, warn=FALSE) {
 #'
 #' @return Darcy friction factor
 #' 
+#' @seealso [util_MB_Blasius()], [util_MB_Colebrook()]
+#' 
 #' @export
 #' @md
 l_Darcy_friction_factor <- function(Re, roughness, D, tol=1e-8, itMax=10) {
@@ -117,6 +121,9 @@ l_Darcy_friction_factor_core <- function(Re, roughness, D, tol=1e-8, itMax=10) {
 #' * `NLvBS_up`: Bubble/Slug transition (Upflow)
 #' * `NLvST`: Stratified (Downflow)
 #'
+#' @usage l_dlns_MB(vsG, vsL, ID, densityG, densityL,
+#'           viscosityG, viscosityL, surfaceTension, angle)
+#'
 #' @param vsG Superficial velocity of gas
 #' @param vsL Superficial velocity of liquid
 #' @param ID Pipe internal diameter
@@ -132,8 +139,7 @@ l_Darcy_friction_factor_core <- function(Re, roughness, D, tol=1e-8, itMax=10) {
 #'         `vsL`, `D`, `densityG`, `densityL`, `viscosityG`, `viscosityL`,
 #'         `surfaceTension`, and `angle`)
 #'
-#' @usage l_dlns_MB(vsG, vsL, ID, densityG, densityL,
-#'           viscosityG, viscosityL, surfaceTension, angle)
+#' @seealso [call_MB()]
 #'
 #' @examples
 #' # This example is from Brill and Mukherjee (1999)
@@ -214,13 +220,13 @@ l_dlns_MB <- function(vsG, vsL, ID, densityG, densityL, viscosityG, viscosityL, 
 #' * 3: Slug
 #' * 4: Bubbly
 #'
-#' @param DLNs Dimensionless numbers calculated by `l_dlns_MB()`
+#' @param dlns Dimensionless numbers calculated by `l_dlns_MB()`
 #' @return a vector of numbers indicating flow regime (1: Stratified, 2: Annular, 3: Slug, and 4: Bubbly)
 #' @export
 #' @md
-l_flow_regime_MB <- function(DLNs) {
+l_flow_regime_MB <- function(dlns) {
   mapply(MukherjeeBrill:::l_flow_regime_MB_core,
-         DLNs$NGv, DLNs$NLv, DLNs$angle, DLNs$NGvSM, DLNs$NGvBS, DLNs$NLvBS_up, DLNs$NLvST)
+         dlns$NGv, dlns$NLv, dlns$angle, dlns$NGvSM, dlns$NGvBS, dlns$NLvBS_up, dlns$NLvST)
 }
 
 # Core logic to determine flow regime
@@ -284,12 +290,12 @@ l_flow_regime_MB_core <- function(NGv, NLv, angle, NGvSM, NGvBS, NLvBS_up, NLvST
 
 #' Low-level function to calculate holdup
 #'
-#' @param DLNs dimensionless numbers calculated by `l_dlns_MB()`
+#' @param dlns dimensionless numbers calculated by `l_dlns_MB()`
 #' @param flowRegime flow regime estimated by `l_flow_regime_MB()`
 #' @return holdup
 #' @export
 #' @md
-l_holdup_MB <- function(DLNs, flowRegime) {
+l_holdup_MB <- function(dlns, flowRegime) {
   # coefficients
   co <- cbind(
     c(-0.380113, 0.129875, -0.119788,  2.343227, 0.475686, 0.288657),   # Up
@@ -298,10 +304,10 @@ l_holdup_MB <- function(DLNs, flowRegime) {
   )
   
   # 1: Up, 2: DownStratified, 3: DownOther
-  j <- ifelse((DLNs$angle >= 0), 1, ifelse((flowRegime == 1), 2, 3))
+  j <- ifelse((dlns$angle >= 0), 1, ifelse((flowRegime == 1), 2, 3))
   #cat(j)
-  t1 <- co[1,j] + (co[2,j] * sin(DLNs$angle)) + (co[3,j] * sin(DLNs$angle)^2) + (co[4,j] * DLNs$NL^2)
-  t2 <- DLNs$NGv^co[5,j] / DLNs$NLv^co[6,j]
+  t1 <- co[1,j] + (co[2,j] * sin(dlns$angle)) + (co[3,j] * sin(dlns$angle)^2) + (co[4,j] * dlns$NL^2)
+  t2 <- dlns$NGv^co[5,j] / dlns$NLv^co[6,j]
   exp(t1 * t2)
 }
 
@@ -312,7 +318,7 @@ l_holdup_MB <- function(DLNs, flowRegime) {
 
 #' Low-level function to calculate pressure drop
 #'
-#' @param DLNs dimensionless numbers calculated by `l_dlns_MB()`
+#' @param dlns dimensionless numbers calculated by `l_dlns_MB()`
 #' @param flowRegime flow regime estimated by `l_flow_regime_MB()`
 #' @param HL Holdup
 #' @param roughness Pipe roughness
@@ -327,14 +333,14 @@ l_holdup_MB <- function(DLNs, flowRegime) {
 #'
 #' @export
 #' @md
-l_dPdL_MB <- function(DLNs, flowRegime, HL, roughness, pressure, debug=FALSE) {
+l_dPdL_MB <- function(dlns, flowRegime, HL, roughness, pressure, debug=FALSE) {
   if (missing(pressure) == TRUE) {
     pressure <- NA
   }
 
   t(mapply(MukherjeeBrill:::l_dPdL_core_MB,
-           DLNs$ID, DLNs$vsG, DLNs$vsL, DLNs$densityG, DLNs$densityL,
-           DLNs$viscosityG, DLNs$viscosityL, DLNs$angle,
+           dlns$ID, dlns$vsG, dlns$vsL, dlns$densityG, dlns$densityL,
+           dlns$viscosityG, dlns$viscosityL, dlns$angle,
            flowRegime, HL, roughness, pressure, debug))
 }
 

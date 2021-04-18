@@ -61,11 +61,13 @@ call_MB(vsG, vsL, ID, densityG, densityL,
 vector_vsG <- 1:10
 vector_vsL <- 1:10
 angle2 <- - pi/ 6
-frm <- generate_frm_MB(vector_vsG, vector_vsL, ID, densityG, densityL,
-                       viscosityG, viscosityL, surfaceTension, angle2)
+frm <- generate_frm_MB(vector_vsG, vector_vsL, ID,
+                       densityG, densityL,
+                       viscosityG, viscosityL,
+                       surfaceTension, angle2)
 
-# s (black): Stratified, S (green): Slug, B (blue): Bubble
-plot(frm, main="downward flow (-30 deg)")
+# s (black): Stratified, A (red): Annular, S (green): Slug, B (blue): Bubble
+plot(frm, main="downward flow (-30 deg)", las=1)
 ```
 
 If you use log-scale for axis, `util_MB_vs_vector()` may be helpful.
@@ -74,11 +76,13 @@ If you use log-scale for axis, `util_MB_vs_vector()` may be helpful.
 # vs_vector_MB(from, to, num_points, log_scale)
 vector_vsG2 <- util_MB_vs_vector(0.1, 100, 10, TRUE)
 vector_vsL2 <- util_MB_vs_vector(0.1, 100, 10, TRUE)
-frm_wider <- generate_frm_MB(vector_vsG2, vector_vsL2, ID, densityG, densityL,
-                             viscosityG, viscosityL, surfaceTension, angle2)
+frm_wider <- generate_frm_MB(vector_vsG2, vector_vsL2, ID,
+                             densityG, densityL,
+                             viscosityG, viscosityL,
+                             surfaceTension, angle2)
 
 # s (black): Stratified, A (red): Annular, S (green): Slug, B (blue): Bubble
-plot(frm_wider, log="xy")
+plot(frm_wider, log="xy", main="downward flow (-30 deg)", las=1)
 vector_vsG2
 ```
 
@@ -90,8 +94,8 @@ vector_vsG2
 
 Air and water two-phase flow in an inclined pipe. 
 
-```{r sfs}
-# Functions for density and viscosity of air
+```{r fs1}
+# Properties of air and water
 density_air <- function(temperature, pressure) {
   testdata_MB$ideal_gas_density(temperature, pressure, testdata_MB$Mair)
 }
@@ -102,26 +106,28 @@ viscosity_air <- function(temperature) {
                                     testdata_MB$Sutherland_C_air)
 }
 
-# Properties of water
 density_water <- 1000          # kg/m3
 viscosity_water <- 0.001       # Pa-s
 surfaceTension_water <- 0.072  # N/m
+```
 
+```{r fs2}
+# Flow conditions
 temperature <- 20 + 273.15     # 20 degC
 inlet_pressure <- 20 * 100000  # 20 bar
 ID <- 0.1                      # 10 cm
-angle <- pi/6                  # 30 deg (upward)
+angle_up <- pi/6               # 30 deg (upward)
 roughness <- 0.0001            # m  - Pipe roughness
-
-pipe_length <- 1000             # m
+pipe_length <- 1000            # m
 num_section <- 20
 
-massflowrate_air <- 1        # kg/s
+# Mass flow rates of air and water
+massflowrate_air <- 1          # kg/s
 massflowrate_water <- 2        # kg/s
-
 ```
 
-```{r}
+```{r fs3}
+# Length of each section and flow area
 section_length <- pipe_length / num_section
 area <- (ID/2)^2 * pi
 
@@ -132,32 +138,37 @@ df <- data.frame(L=seq(section_length, pipe_length, by=section_length),
                  dPdL_H=NAs, dPdL_F=NAs, dPdL_A=NAs,
                  vsG=NAs, vsL=NAs)
 
-pressure <- inlet_pressure
+# Flow simulaion
+pressure_ <- inlet_pressure
 
 for (i in 1:num_section) {
-  densityG <- density_air(temperature, pressure)
-  densityL <- density_water
-  viscosityG <- viscosity_air(temperature)
-  viscosityL <- viscosity_water
-  surfaceTension <- surfaceTension_water
-  vsG <- massflowrate_air / densityG / area
-  vsL <- massflowrate_water / densityL / area
+  densityG_ <- density_air(temperature, pressure_)
+  densityL_ <- density_water
+  viscosityG_ <- viscosity_air(temperature)
+  viscosityL_ <- viscosity_water
+  surfaceTension_ <- surfaceTension_water
+  vsG_ <- massflowrate_air / densityG_ / area
+  vsL_ <- massflowrate_water / densityL_ / area
   
-  ret <- call_MB(vsG, vsL, ID, densityG, densityL,
-                 viscosityG, viscosityL, surfaceTension,
-                 angle, roughness, pressure)
-  pressure <- pressure - (ret$dPdL * section_length)
+  ret <- call_MB(vsG_, vsL_, ID, densityG_, densityL_,
+                 viscosityG_, viscosityL_, surfaceTension_,
+                 angle_up, roughness, pressure_)
+  pressure_ <- pressure_ - (ret$dPdL * section_length)
   
-  df$pressure[i] <- pressure
+  df$pressure[i] <- pressure_
   df$fr[i] <- ret$fr
   df$hl[i] <- ret$hl
   df$dPdL[i] <- ret$dPdL
   df$dPdL_H[i] <- ret$dPdL_H
   df$dPdL_F[i] <- ret$dPdL_F
   df$dPdL_A[i] <- ret$dPdL_A
-  df$vsG[i] <- vsG
-  df$vsL[i] <- vsL
+  df$vsG[i] <- vsG_
+  df$vsL[i] <- vsL_
 }
+
+plot(df$L, df$pressure/100/1000, type="l", xlab='L [m]', ylab='P [bar]', las=1)
+# 3: Slug, 2: Annular
+plot(df$L, df$fr, type="l", col="red", xlab='L [m]', ylab='Flow regime', las=1)
 
 df
 ```
@@ -166,31 +177,16 @@ df
 
 ----
 
+# Utils
 
-```{r setup}
-library(MukherjeeBrill)
+```{r}
+roughness <- 0.001
+Re <- util_MB_vs_vector(4001, 10^8, 100, TRUE)
+plot(Re, util_MB_Colebrook(Re, roughness, 1), type="l", log="xy", ylim=c(0.005,0.1), ylab="fD")
+abline(h=0.02, lty=2)
 
-# Basic settings
-temperature <- 10 + 273.15   # 10 degC
-pressure <- 3 * 100000       # 3 bar
-ID <- 0.05                   # 5 cm
-angle <- -pi/6               # -30 deg (downward)
+#util_MB_Colebrook(Re, roughness, 1)
 
-
-# Properties of fluids for examples
-density_air <- function(temperature, pressure) {
-  testdata_MB$ideal_gas_density(temperature, pressure, testdata_MB$Mair)
-}
-viscosity_air <- function(temperature) {
-  testdata_MB$Sutherland_viscosityG(temperature, testdata_MB$Sutherland_vis0_air,
-                                    testdata_MB$Sutherland_T0_air, testdata_MB$Sutherland_C_air)
-}
-
-densityG <- density_air(temperature, pressure)
-densityL <- testdata_MB$Kerosene_density(temperature)
-viscosityG <- viscosity_air(temperature)
-viscosityL <- testdata_MB$Kerosene_viscosity(temperature)
-surfaceTension <- testdata_MB$Kerosene_surfaceTension(temperature)
 ```
 
 

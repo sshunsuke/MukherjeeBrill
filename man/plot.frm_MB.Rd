@@ -32,3 +32,6 @@ plot(frm)    # MukherjeeBrill:::plot.frm_MB(frm)
 \references{
 Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
 }
+\seealso{
+\code{\link[=generate_frm_MB]{generate_frm_MB()}}
+}

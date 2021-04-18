@@ -43,9 +43,9 @@ Data frame including following data:
 }
 }
 \description{
-Call core functions of Mukherjee & Brill model: \code{l_dlns_MB()}, \code{l_flow_regime_MB()},
-\code{l_holdup_MB()}, and \code{l_dPdL_MB()} to calculate flow regime, holdup, and pressure drop.
-The last argument (\code{pressure}) is for consideration of accelaration, which you can ignore.
+Call core functions of Mukherjee & Brill model: \code{\link[=l_dlns_MB]{l_dlns_MB()}}, \code{\link[=l_flow_regime_MB]{l_flow_regime_MB()}},
+\code{\link[=l_holdup_MB]{l_holdup_MB()}}, and \code{\link[=l_dPdL_MB]{l_dPdL_MB()}} to calculate flow regime, holdup, and pressure drop.
+The last argument, \code{pressure}, is an optional parameter to consider accelaration.
 }
 \note{
 You can execute the calculation step by step by calling low-level functions if you need. Below is an example.\preformatted{dlns <- l_dlns_MB(vsG, vsL, ID, densityG, densityL,
@@ -81,5 +81,13 @@ call_MB(vsG, vsL, ID, densityG, densityL,
 \item Mukherjee, H., and J. P. Brill. 1985. Pressure Drop Correlations for Inclined Two-Phase Flow. Journal of Energy Resources Technology, Transactions of the ASME 107 (4)
 \item Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
 \item J. P. Brill., and Mukherjee, H. 1999. Multiphase Flow in Wells. Society of Petroleum Engineers.
+}
+}
+\seealso{
+\itemize{
+\item \code{\link[=l_dlns_MB]{l_dlns_MB()}}
+\item \code{\link[=l_flow_regime_MB]{l_flow_regime_MB()}}
+\item \code{\link[=l_holdup_MB]{l_holdup_MB()}}
+\item \code{\link[=l_dPdL_MB]{l_dPdL_MB()}}
 }
 }

@@ -4,10 +4,10 @@
 \alias{l_flow_regime_MB}
 \title{Low-level function to determine flow regime}
 \usage{
-l_flow_regime_MB(DLNs)
+l_flow_regime_MB(dlns)
 }
 \arguments{
-\item{DLNs}{Dimensionless numbers calculated by \code{l_dlns_MB()}}
+\item{dlns}{Dimensionless numbers calculated by \code{l_dlns_MB()}}
 }
 \value{
 a vector of numbers indicating flow regime (1: Stratified, 2: Annular, 3: Slug, and 4: Bubbly)

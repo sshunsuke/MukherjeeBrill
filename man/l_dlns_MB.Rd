@@ -62,3 +62,6 @@ angle <- pi/2                  # 90 deg (upward)
 l_dlns_MB(vsG, vsL, ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
 
 }
+\seealso{
+\code{\link[=call_MB]{call_MB()}}
+}
