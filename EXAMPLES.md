@@ -1,9 +1,22 @@
 # Examples
 
+## Install
+
+```r
+# install.packages("remotes")
+remotes::install_github("sshunsuke/MukherjeeBrill")
+```
+
 ## Setup
 
 ```r
 library(MukherjeeBrill)
+```
+
+## Help
+
+```r
+help("MukherjeeBrill")
 ```
 
 ----
@@ -37,7 +50,7 @@ call_MB(vsG, vsL, ID, densityG, densityL, viscosityG, viscosityL, surfaceTension
 ```r
 vector_vsG <- 1:10
 vector_vsL <- 1:10
-angle2 <- - pi/ 6
+angle2 <- - pi / 6
 frm <- generate_frm_MB(vector_vsG, vector_vsL, ID,
                        densityG, densityL,
                        viscosityG, viscosityL,
@@ -50,7 +63,7 @@ plot(frm, main="downward flow (-30 deg)", las=1)
 If you use log-scale for axis, `util_MB_vs_vector()` may be helpful.
 
 ```r
-# vs_vector_MB(from, to, num_points, log_scale)
+# util_MB_vs_vector(from, to, num_points, log_scale)
 vector_vsG2 <- util_MB_vs_vector(0.1, 100, 10, TRUE)
 vector_vsL2 <- util_MB_vs_vector(0.1, 100, 10, TRUE)
 frm_wider <- generate_frm_MB(vector_vsG2, vector_vsL2, ID,
