@@ -1,7 +1,7 @@
 Package: MukherjeeBrill
 Type: Package
 Title: Mukherjee & Brill model for gas-liquid two-phase flow in a circular pipe
-Version: 0.5.0
+Version: 0.5.1
 Author: Shunsuke
 Maintainer: The package maintainer <s_shunske@yahoo.co.jp>
 Description: Mukherjee & Brill model for gas-liquid two-phase flow in a circular pipe
