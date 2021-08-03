@@ -77,11 +77,12 @@ Show help.
 help("MukherjeeBrill")
 ```
 
-You can fine more examples [here](EXAMPLES.md). 
+You can find more examples [here](EXAMPLES.md). 
 
 
 ## License 
 
+[MIT License](LICENSE.md)
 
 
 ## Related documents

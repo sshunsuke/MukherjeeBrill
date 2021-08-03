@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-# Setup
+# Install
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -15,6 +15,14 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+
+```{r, eval=FALSE}
+# install.packages("remotes")
+remotes::install_github("sshunsuke/MukherjeeBrill")
+```
+
+
+# Load module
 
 ```{r }
 library(MukherjeeBrill)
@@ -177,12 +185,14 @@ df
 
 ----
 
-# Utils
+# Utilities
+
+## Calculation of Darcy friction factor with Colebrook correlataion
 
 ```{r}
 roughness <- 0.001
 Re <- util_MB_vs_vector(4001, 10^8, 100, TRUE)
-plot(Re, util_MB_Colebrook(Re, roughness, 1), type="l", log="xy", ylim=c(0.005,0.1), ylab="fD")
+plot(Re, util_MB_Colebrook(Re, roughness, 1), type="l", log="xy", ylim=c(0.01,0.1), ylab="fD", las=1)
 abline(h=0.02, lty=2)
 
 #util_MB_Colebrook(Re, roughness, 1)
