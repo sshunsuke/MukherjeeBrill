@@ -25,19 +25,27 @@ Prediction of flow regime, holdup, and pressure drop.
 library(MukherjeeBrill)
 
 # Flow conditions (SI unit is used for all properties)
-vsG <- 5                 # m/s   - superficial velocity of gas
-vsL <- 1                 # m/s   - superficial velocity of liquid
-ID <- 0.1                # m     - pipe inner diameter
-densityG <- 1            # kg/m3 - density of gas
-densityL <- 1000         # kg/m3 - density of liquid 
-viscosityG <- 10^(-5)    # Pa-s  - viscosity of gas
-viscosityL <- 10^(-3)    # Pa-s  - viscosity of liquid
-surfaceTension <- 0.072  # N/m
-angle <- pi/2            # rad (positive means upward) - Pipe inclination 
-roughness <- 0.0001      # m  - Pipe roughness
+vsG <- 5                 # Superficial velocity of gas [m/s]
+vsL <- 1                 # Superficial velocity of liquid [m/s]
+ID <- 0.1                # Pipe inner diameter [m]
+densityG <- 1            # Density of gas [kg/m3]
+densityL <- 1000         # Density of liquid [kg/m3]
+viscosityG <- 10^(-5)    # Viscosity of gas [Pa-s]
+viscosityL <- 10^(-3)    # Viscosity of liquid [Pa-s]
+surfaceTension <- 0.072  # Surface tension [N/m]
+angle <- pi/2            # Pipe inclination [rad] (positive means upward)
+roughness <- 0.0001      # Pipe roughness [m] 
 
 # Predict flow regime, holdup, and pressure drop. 
+# call_MB() returns a data frame including six columns:
+#   - fr: Flow regime (1: Stratified, 2: Annular, 3: Slug, and 4: Bubbly)
+#   - hl: Holdup
+#   - dPdL: Pressure drop per unit length [Pa/m]
+#   - dPdL_H: Pressure drop per unit length due to hydrostatic [Pa/m]
+#   - dPdL_F: Pressure drop per unit length due to friction [Pa/m]
+#   - dPdL_A: Pressure drop per unit length due to acceleration [Pa/m]
 call_MB(vsG, vsL, ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle, roughness)
+
 #   fr        hl     dPdL   dPdL_H   dPdL_F dPdL_A
 # 1  3 0.3272534 4403.032 3213.676 1189.355      0
 ```
@@ -48,8 +56,11 @@ Create a flow regime map.
 vector_vsG <- 1:10
 vector_vsL <- 1:10
 angle2 <- - pi/ 6
+
+# generate_frm_MB() returns a S3 class object, the class name of which is 'frm_MB'. 
 frm <- generate_frm_MB(vector_vsG, vector_vsL, ID, densityG, densityL,
                        viscosityG, viscosityL, surfaceTension, angle2)
+
 # Plot a flow regime map
 #   s (black): Stratified, A (red): Annular, S (green): Slug, B (blue): Bubble
 plot(frm)
