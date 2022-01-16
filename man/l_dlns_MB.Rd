@@ -33,7 +33,7 @@ Data frame including dimensionless numbers (\code{NLv}, \code{NGv}, \code{Nd}, \
 \code{surfaceTension}, and \code{angle})
 }
 \description{
-Return the dimensionless groups proposed by Duns & Ros:
+Return the dimensionless groups proposed by Duns & Ros (1963):
 \itemize{
 \item \code{NLv}: Liquid velocity number
 \item \code{NGv}: Gas velocity number
@@ -61,6 +61,12 @@ angle <- pi/2                  # 90 deg (upward)
 #  NLv=11.87, NGv=11.54, NGvSM=350.8, NLvBS_up=18.40, NL=0.0118
 l_dlns_MB(vsG, vsL, ID, densityG, densityL, viscosityG, viscosityL, surfaceTension, angle)
 
+}
+\references{
+\itemize{
+\item Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
+\item Duns, H. and Ros N. C. J. 1963. Vertical flow of gas and liquid mixtures in wells. In: 6th World Petroleum Congress
+}
 }
 \seealso{
 \code{\link[=call_MB]{call_MB()}}

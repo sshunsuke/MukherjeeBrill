@@ -86,7 +86,7 @@ call_MB <- function(vsG, vsL, ID, densityG, densityL,
   dPdL <- l_dPdL_MB(dlns, fr, hl, roughness, pressure, debug=FALSE)
   
   if (any(hl < 0) || any(hl > 1)) {
-    stop(sprintf("holdup was not calculated correctly (hl=%.3f). call_MB() may not support viscous liquid.", hl))
+    stop(sprintf("call_MB() - holdup was not calculated correctly (hl=%.3f). call_MB() may not support viscous liquid.", hl))
   }
   
   data.frame("fr" = fr, "hl" = hl, "dPdL" = as.vector(dPdL[,'dPdL']),

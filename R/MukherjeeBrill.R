@@ -46,7 +46,7 @@ Colebrook_core <- function(Re, roughness, D, tol, itMax, warn) {
   while (abs(d) >= tol) {
     it <- it + 1
     if (it > itMax) {
-      stop(sprintf("Calculation did not converge, tol=%f, itMax=%d.", tol, itMax))
+      stop(sprintf("Colebrook_core() - Calculation did not converge, tol=%f, itMax=%d.", tol, itMax))
     }
     
     d <- fun(fD_n) / dFun(fD_n)
@@ -106,12 +106,12 @@ l_Darcy_friction_factor_core <- function(Re, roughness, D, tol=1e-8, itMax=10) {
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - -
-# Dimensionless groups proposed by Duns & Ros ----
+# Dimensionless groups proposed by Duns & Ros (1963) ----
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #' Low-level function to calculate dimensionless numbers
 #'
-#' Return the dimensionless groups proposed by Duns & Ros:
+#' Return the dimensionless groups proposed by Duns & Ros (1963):
 #' * `NLv`: Liquid velocity number
 #' * `NGv`: Gas velocity number
 #' * `Nd`: Pipe diameter number
@@ -138,6 +138,10 @@ l_Darcy_friction_factor_core <- function(Re, roughness, D, tol=1e-8, itMax=10) {
 #'         `NGvSM`, `NLvBS`, `NGvBS_up`, and `NLvST`) and input values (`vsG`, 
 #'         `vsL`, `D`, `densityG`, `densityL`, `viscosityG`, `viscosityL`,
 #'         `surfaceTension`, and `angle`)
+#'
+#' @references
+#' * Mukherjee, H., and J. P. Brill. 1985. Empirical Equations to Predict Flow Patterns in Two-Phase Inclined Flow. International Journal of Multiphase Flow 11 (3)
+#' * Duns, H. and Ros N. C. J. 1963. Vertical flow of gas and liquid mixtures in wells. In: 6th World Petroleum Congress
 #'
 #' @seealso [call_MB()]
 #'
@@ -434,7 +438,7 @@ l_dPdL_core_MB <- function(D, vsG, vsL, densityG, densityL, viscosityG, viscosit
       dPdL_F <- fD * densityMixS * vmix^2 / (2 * D)
     } else {
       # error!
-      stop("Undefined flow regime.")
+      stop(sprintf("l_dPdL_core_MB() - Undefined flow regime, flowRegime=%d", flowRegime))
     }
     
     dPdL_H <- densityMixS * g * sin(angle)
